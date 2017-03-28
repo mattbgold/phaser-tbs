@@ -1,0 +1,23 @@
+{
+  "name": "phaser-tbs",
+  "version": "1.0.0",
+  "description": "Turn Based Strategy",
+  "main": "dist/index.js",
+  "scripts": {
+    "start": "webpack-dev-server -d --inline --hot --progress --no-info --port 9000",
+    "build": "rimraf ./dist && webpack -p"
+  },
+  "author": "Matt Gold",
+  "license": "MIT",
+  "devDependencies": {
+    "copy-webpack-plugin": "^3.0.1",
+    "expose-loader": "^0.7.1",
+    "html-webpack-plugin": "^2.22.0",
+    "phaser": "^2.6.2",
+    "rimraf": "^2.5.4",
+    "ts-loader": "^0.8.2",
+    "typescript": "^2.0.3",
+    "webpack": "^1.13.2",
+    "webpack-dev-server": "^1.16.1"
+  }
+}
