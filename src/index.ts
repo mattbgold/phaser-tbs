@@ -4,18 +4,24 @@ import * as Phaser from 'phaser';
 import 'phaser-plugin-isometric/dist/phaser-plugin-isometric';
 import Group = Phaser.Group;
 import {BaseUnit} from "./game_objects/unit";
-import {TbsController} from "./controllers/TbsController";
+import {GameController} from "./controllers/game/controller";
+import {GameConfig, getConfig} from "./config";
+import {UnitController} from "./controllers/game/unit/controller";
 
 class TbsGame {
   game: Phaser.Game;
-  controller: TbsController;
+  controller: GameController;
   cursorPos: any;
   isoGroup: Group;
-  unit:BaseUnit; //TODO: remove me
-
+  unit: BaseUnit; //TODO: remove me
+  config: GameConfig;
+  unitController: UnitController;
+  
   constructor() {
     this.game = new Phaser.Game(960, 640, Phaser.AUTO, "content", this);
-    this.controller = new TbsController(38, this.game);
+    this.config = getConfig();
+    let ctrl = new GameController(this.game, this.config);
+    this.unitController = new UnitController(ctrl);
   }
 
   preload () {
@@ -31,7 +37,6 @@ class TbsGame {
 
     //game settings
     this.game.iso.anchor.setTo(0.5, 0.2);
-    this.game[''];
   }
 
   create() {
@@ -69,8 +74,7 @@ class TbsGame {
         this.game.add.tween(tile).to({ isoZ: 4 }, 200, Phaser.Easing.Quadratic.InOut, true);
 
         if(this.game.input.activePointer.leftButton.isDown) {
-          console.log('asdf');
-          this.unit.setPosition(tile.isoX/38, tile.isoY/38);
+          this.unitController.move(this.unit, tile.isoX/this.config.cellSize, tile.isoY/this.config.cellSize);
         }
       }
       // If not, revert back to how it was.
@@ -95,12 +99,12 @@ class TbsGame {
   }
 
   private spawnUnits(): void {
-    this.unit = new BaseUnit({
+    this.unit = this.unitController.create({
       name: 'test',
       asset: 'unit',
       x: 4,
       y: 8
-    }, this.controller);
+    });
   }
 }
 

@@ -3,32 +3,50 @@ import {Unit} from "../models/unit";
 import Sprite = Phaser.Sprite;
 import Game = Phaser.Game;
 import IsoSprite = Phaser.Plugin.Isometric.IsoSprite;
-import {TbsController} from "../controllers/TbsController";
 
-export class BaseUnit //implements Unit
-{
-	private _spr: IsoSprite;
+//TODO: make abstract
+export class BaseUnit implements Unit {
+	spr: IsoSprite;
 
-	constructor(private _model: Unit, private _ctrl: TbsController) {
-		this._spr = _ctrl.game.add.isoSprite(_model.x*_ctrl.gridSize, _model.y*_ctrl.gridSize, 0, _model.asset, 0);
-		this._spr.anchor.set(.5, .7);
-	}
+	name: string;
+	asset: string;
 
-	setPosition(x, y): void {
-		this._spr.scale.x = Math.sign(this._model.x - x)
+	x: number;
+	y: number;
 
-		var movementX = this._ctrl.game.add.tween(this._spr)
-			.to({ isoX: x * this._ctrl.gridSize }, Math.abs(this._model.x - x)*150, Phaser.Easing.Quadratic.InOut);
+	//TODO: move to Stats model
+	attack: number;
+	defense: number;
+	speed: number;
+	hp:number;
 
-		movementX.onComplete.add(_ => {
-			this._spr.scale.x = Math.sign(y - this._model.y) || 1
-			this._model.x = x;
-			this._model.y = y;
-		} , this);
+	abilities: any[];
+	
+	constructor(model: Unit, spr: IsoSprite) {
+		this.spr = spr;
+		this.spr.anchor.set(.5, .7);
 		
-		var movementY = this._ctrl.game.add.tween(this._spr)
-			.to({ isoY: y * this._ctrl.gridSize }, Math.abs(this._model.y - y)*150, Phaser.Easing.Quadratic.InOut, false, 200);
-
-		movementX.chain(movementY).start();
+		this.init(model);
+	}
+	
+	init(unit: Unit) {
+		this.name = unit.name;
+		this.asset = unit.asset;
+		this.x = unit.x;
+		this.y = unit.y;
+		this.attack = unit.attack;
+		this.defense = unit.defense;
+		this.speed = unit.speed;
+		this.hp = unit.hp;
+		this.abilities = unit.abilities;
+	}
+	
+	setXPosition(x): void {
+		this.spr.scale.x = Math.sign(this.x - x);
+		this.x = x;
+	}
+	setYPosition(y): void {
+		this.spr.scale.x = Math.sign(y - this.y) || 1;
+		this.y = y;
 	}
 }

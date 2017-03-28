@@ -1,6 +1,6 @@
 export interface Unit {
 	name: string;
-	asset: string; //TODO: move to VisibleGameElement abstraction?
+	asset: string;
 
 	x: number;
 	y: number;
