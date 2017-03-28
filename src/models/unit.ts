@@ -1,3 +1,5 @@
+import {Stats} from "./stats";
+
 export interface Unit {
 	name: string;
 	asset: string;
@@ -5,10 +7,7 @@ export interface Unit {
 	x: number;
 	y: number;
 
-	attack?: number;
-	defense?: number;
-	speed?: number;
-	hp?:number;
+	stats?: Stats
 
 	abilities?: any[];
 }

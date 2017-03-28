@@ -3,6 +3,7 @@ import {Unit} from "../models/unit";
 import Sprite = Phaser.Sprite;
 import Game = Phaser.Game;
 import IsoSprite = Phaser.Plugin.Isometric.IsoSprite;
+import {Stats} from "../models/stats";
 
 //TODO: make abstract
 export class BaseUnit implements Unit {
@@ -14,11 +15,7 @@ export class BaseUnit implements Unit {
 	x: number;
 	y: number;
 
-	//TODO: move to Stats model
-	attack: number;
-	defense: number;
-	speed: number;
-	hp:number;
+	stats: Stats;
 
 	abilities: any[];
 	
@@ -34,10 +31,7 @@ export class BaseUnit implements Unit {
 		this.asset = unit.asset;
 		this.x = unit.x;
 		this.y = unit.y;
-		this.attack = unit.attack;
-		this.defense = unit.defense;
-		this.speed = unit.speed;
-		this.hp = unit.hp;
+		this.stats = unit.stats;
 		this.abilities = unit.abilities;
 	}
 	
