@@ -1,6 +1,7 @@
 {
   "version": "2.0.0",
   "compilerOptions": {
+    "lib": ["es5", "dom", "es2015.core"],
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "target": "ES5",
