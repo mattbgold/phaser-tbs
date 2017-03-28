@@ -7,6 +7,7 @@ import {BaseUnit} from "./game_objects/unit";
 import {GameController} from "./controllers/game/controller";
 import {GameConfig, getConfig} from "./config";
 import {UnitController} from "./controllers/game/unit/controller";
+import {GridController} from "./controllers/game/grid/controller";
 
 class TbsGame {
   game: Phaser.Game;
@@ -16,12 +17,14 @@ class TbsGame {
   unit: BaseUnit; //TODO: remove me
   config: GameConfig;
   unitController: UnitController;
-  
+  gridController: GridController;
+
   constructor() {
     this.game = new Phaser.Game(960, 640, Phaser.AUTO, "content", this);
     this.config = getConfig();
     let ctrl = new GameController(this.game, this.config);
     this.unitController = new UnitController(ctrl);
+    this.gridController = new GridController(ctrl);
   }
 
   preload () {
@@ -45,7 +48,7 @@ class TbsGame {
     this.isoGroup = this.game.add.group();
 
     // Let's make a load of tiles on a grid.
-    this.spawnTiles(10, 8, this.isoGroup);
+    this.gridController.init();
 
     this.spawnUnits();
 
@@ -84,18 +87,6 @@ class TbsGame {
         this.game.add.tween(tile).to({ isoZ: 0 }, 200, Phaser.Easing.Quadratic.InOut, true);
       }
     });
-  }
-
-  private spawnTiles(sizeX: number, sizeY: number, group: Group): void {
-    let tile;
-    for (var xx = 0; xx < sizeX; xx++) {
-      for (var yy = 0; yy < sizeY; yy++) {
-        // Create a tile using the new game.add.isoSprite factory method at the specified position.
-        // The last parameter is the group you want to add it to (just like game.add.sprite)
-        tile = this.game.add.isoSprite(xx*38, yy*38, 0, 'tile', 0, group);
-        tile.anchor.set(0.5, 0);
-      }
-    }
   }
 
   private spawnUnits(): void {
