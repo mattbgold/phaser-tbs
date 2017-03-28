@@ -12,6 +12,13 @@ export class GameController {
 	constructor(game:Game, config: GameConfig) {
 		this.config = config;
 		this.game = game;
+
+		this.signals = this.state= {};
+
+		//TODO: remove this later - POC
+		for(let i in EVENTS) {
+			this.subscribe(EVENTS[i], _ => console.log(EVENTS[i], _));
+		}
 	}
 
 
@@ -29,3 +36,5 @@ export enum GameEvent {
 	UnitSelected,
 	UnitMoved
 }
+
+const EVENTS: GameEvent[] = [GameEvent.GridCellActivated, GameEvent.UnitSelected, GameEvent.UnitMoved];

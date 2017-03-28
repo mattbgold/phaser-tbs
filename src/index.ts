@@ -67,6 +67,7 @@ class TbsGame {
     // determined from the 2D pointer position without extra trickery. By default, the z position is 0 if not set.
     this.game.iso.unproject(this.game.input.activePointer.position, this.cursorPos);
 
+    //TODO: cursorPos to gameController state and move the following loop to GridController
     // Loop through all tiles and test to see if the 3D position from above intersects with the automatically generated IsoSprite tile bounds.
     this.isoGroup.forEach(tile =>  {
       var inBounds = tile.isoBounds.containsXY(this.cursorPos.x, this.cursorPos.y);
