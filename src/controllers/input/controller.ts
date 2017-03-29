@@ -14,9 +14,9 @@ export class InputController extends BaseController {
 	}
 
 	init() {
-		// for(let i in [0,1,2,3]) {
-		// 	this.subscribe(parseInt(i), _ => console.log(InputEvent[parseInt(i)], _));
-		// }
+		 // for(let i in [0,1,2,3]) {
+		 // 	this.subscribe(parseInt(i), _ => console.log(InputEvent[parseInt(i)], _));
+		 // }
 	}
 
 	update() {
@@ -26,11 +26,11 @@ export class InputController extends BaseController {
 		//fire mouse events
 		if(!this._isDown && this._isDownNow()) {
 			this._isDown = true;
-			this.signals[InputEvent.MouseDown].dispatch(this.cursorPos);
+			this.dispatch(InputEvent.MouseDown, this.cursorPos);
 		} else if (this._isDown && !this._isDownNow()) {
 			this._isDown = false;
-			this.signals[InputEvent.MouseUp].dispatch(this.cursorPos);
-			this.signals[InputEvent.Tap].dispatch(this.cursorPos); //TODO: only tap if short time has passed and up pos is near down pos
+			this.dispatch(InputEvent.MouseUp, this.cursorPos);
+			this.dispatch(InputEvent.Tap, this.cursorPos); //TODO: only tap if short time has passed and up pos is near down pos
 		}
 	}
 

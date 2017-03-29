@@ -15,8 +15,10 @@ export class UnitController extends BaseController {
 
 	units: BaseUnit[] = [];
 
-	init() { 
+	init() {
 		this._ctrl.subscribe(GameEvent.GridCellActivated, this._onCellActivated);
+		//TODO: remove me
+		this._ctrl.subscribe(GameEvent.GridCellActivated, this._moveUnit);
 	}
 
 	update() { }
@@ -40,7 +42,7 @@ export class UnitController extends BaseController {
 		var movementY = this._ctrl.game.add.tween(unit.spr)
 			.to({ isoY: y * this._ctrl.config.cellSize }, Math.abs(unit.y - y)*150, Phaser.Easing.Quadratic.InOut, false, 200);
 
-		movementY.onComplete.add(() => this._ctrl.signals[GameEvent.UnitMoved].dispatch(unit));
+		movementY.onComplete.add(() => this._ctrl.dispatch(GameEvent.UnitMoved, unit));
 
 		movementX.chain(movementY).start();
 	}
@@ -48,9 +50,14 @@ export class UnitController extends BaseController {
 	private _onCellActivated = (cell: GridCell): void => {
 		let unitSelected  = this.units.find(unit => unit.x == cell.x && unit.y == cell.y);
 		if(!!unitSelected) {
-			this._ctrl.signals[GameEvent.UnitSelected].dispatch(unitSelected);
+			this._ctrl.dispatch(GameEvent.UnitSelected, unitSelected);
 		}
-	}
+	};
+
+	//TODO: delete me - testing only
+	private _moveUnit = (cell: GridCell): void => {
+		this.move(this.units[0], cell.x, cell.y);
+	};
 	//TODO: we need some kind of TurnExecutor to run the turn in sequence.
 	// for the team in action phase, execute the moves and actions one at a time
 }

@@ -53,15 +53,14 @@ export class GridController extends BaseController {
 	}
 
 	private _onTap = (tapCoords: Phaser.Plugin.Isometric.Point3) => {
-		//TODO: //this.unitController.move(this.unit, tile.isoX/this.config.cellSize, tile.isoY/this.config.cellSize);
-		let cellClicked = this.cells.find(c => c.spr.isoBounds.containsXY(tapCoords.x, tapCoords.y));
+		let clickedCell = this.cells.find(c => c.spr.isoBounds.containsXY(tapCoords.x, tapCoords.y));
 
-		if(!!cellClicked) {
+		if(!!clickedCell) {
 			if(!!this._activeCell)
 				this._activeCell.active = false;
-			cellClicked.active = true;
-			this._activeCell = cellClicked;
-			this._ctrl.signals[GameEvent.GridCellActivated].dispatch(cellClicked);
+			clickedCell.active = true;
+			this._activeCell = clickedCell;
+			this._ctrl.dispatch(GameEvent.GridCellActivated, clickedCell);
 		}
 	}
 }

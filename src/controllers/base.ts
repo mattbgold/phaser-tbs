@@ -2,7 +2,7 @@ import * as Phaser from 'phaser';
 import Signal = Phaser.Signal;
 
 export abstract class BaseController {
-	signals: {[key: number]: Signal} = {};
+	protected signals: {[key: number]: Signal} = {};
 
 	abstract init(): void;
 	abstract update(): void;
