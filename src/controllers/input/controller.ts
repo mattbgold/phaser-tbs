@@ -1,22 +1,22 @@
 import * as Phaser from 'phaser';
-import {Controller} from "../interface";
 import Game = Phaser.Game;
 import Signal = Phaser.Signal;
 import Point3 = Phaser.Plugin.Isometric.Point3;
+import {BaseController} from "../base";
 
-export class InputController implements Controller {
+export class InputController extends BaseController {
 	private _isDown: boolean;
-	private _isUp: boolean;
 
 	cursorPos: Point3 = new Point3();
-	signals: {[key: number]: Signal} = {};
 
 	constructor(private _game: Game){
-		this.signals = {};
+		super();
 	}
 
 	init() {
-
+		// for(let i in [0,1,2,3]) {
+		// 	this.subscribe(parseInt(i), _ => console.log(InputEvent[parseInt(i)], _));
+		// }
 	}
 
 	update() {
@@ -32,13 +32,6 @@ export class InputController implements Controller {
 			this.signals[InputEvent.MouseUp].dispatch(this.cursorPos);
 			this.signals[InputEvent.Tap].dispatch(this.cursorPos); //TODO: only tap if short time has passed and up pos is near down pos
 		}
-	}
-
-	subscribe(event: InputEvent, callback: Function) {
-		if (!this.signals[event])
-			this.signals[event] = new Signal();
-
-		this.signals[event].add(callback);
 	}
 
 	private _isDownNow(): boolean {

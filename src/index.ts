@@ -23,6 +23,7 @@ class TbsGame {
     let ctrl = new GameController(this.game, this.config);
     let input = new InputController(this.game);
     this.controllers.push(ctrl);
+    this.controllers.push(input);
     this.controllers.push(new UnitController(ctrl, input));
     this.controllers.push(new GridController(ctrl, input));
   }

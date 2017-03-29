@@ -1,61 +1,67 @@
 import * as Phaser from 'phaser';
 import {GameController, GameEvent} from "../controller";
-import Group = Phaser.Group;
-import {Controller} from "../../interface";
-import {GridTile} from "../../../game_objects/gridTile";
+import {GridCell} from "../../../game_objects/grid_cell";
 import {InputController, InputEvent} from "../../input/controller";
+import {BaseController} from "../../base";
+import Group = Phaser.Group;
 
-export class GridController implements Controller {
+export class GridController extends BaseController {
 	isoGridGroup: Group;
-	activeTile: any;
+	cells: GridCell[] = [];
+
+	private _activeCell: GridCell;
 
 	constructor(private _ctrl: GameController, private _input: InputController) {
+		super();
 	}
 
 	init(): void {
+		this._input.subscribe(InputEvent.Tap, this._onTap);
+		
 		this.isoGridGroup = this._ctrl.game.add.group();
 
-		for (var xx = 0; xx < this._ctrl.config.gridSizeX; xx++) {
-			for (var yy = 0; yy < this._ctrl.config.gridSizeY; yy++) {
+		for (let xx = 0; xx < this._ctrl.config.gridSizeX; xx++) {
+			for (let yy = 0; yy < this._ctrl.config.gridSizeY; yy++) {
 				// Create a tile using the new game.add.isoSprite factory method at the specified position.
 				// The last parameter is the group you want to add it to (just like game.add.sprite)
-				let tile = this._ctrl.game.add.isoSprite(xx*this._ctrl.config.cellSize, yy*this._ctrl.config.cellSize, 0, 'tile', 0, this.isoGridGroup);
-				tile.anchor.set(0.5, 0);
+				let tileSpr = this._ctrl.game.add.isoSprite(xx*this._ctrl.config.cellSize, yy*this._ctrl.config.cellSize, 0, 'tile', 0, this.isoGridGroup);
+				tileSpr.anchor.set(0.5, 0);
+				this.cells.push(new GridCell(tileSpr, xx, yy));
 			}
 		}
-
-		this._input.subscribe(InputEvent.Tap, this._onTap);
 	}
 	
 	update() {
-		this.isoGridGroup.forEach(tile =>  {;
-			var inBounds = tile.isoBounds.containsXY(this._input.cursorPos.x, this._input.cursorPos.y);
+		this.cells.forEach(cell =>  {
+			let inBounds = cell.spr.isoBounds.containsXY(this._input.cursorPos.x, this._input.cursorPos.y);
 
 			//is the mouse hovering over a tile?
 			if (inBounds) {
-				if (!tile.hover) {
-					tile.hover = true;
-					tile.tint = 0x86bfda;
-					this._ctrl.game.add.tween(tile).to({ isoZ: 4 }, 200, Phaser.Easing.Quadratic.InOut, true);
+				if (!cell.hover) {
+					cell.hover = true;
+					cell.spr.tint = 0x86bfda;
+					this._ctrl.game.add.tween(cell.spr).to({ isoZ: 4 }, 200, Phaser.Easing.Quadratic.InOut, true);
 				}
 			}
 			// If not, revert back to how it was.
-			else if (tile.hover && !inBounds) {
-				tile.hover = false;
-				tile.tint = 0xffffff;
-				this._ctrl.game.add.tween(tile).to({ isoZ: 0 }, 200, Phaser.Easing.Quadratic.InOut, true);
+			else if (cell.hover && !inBounds) {
+				cell.hover = false;
+				cell.spr.tint = 0xffffff;
+				this._ctrl.game.add.tween(cell.spr).to({ isoZ: 0 }, 200, Phaser.Easing.Quadratic.InOut, true);
 			}
 		});
 	}
 
-	private _onTap(tapCoords: Phaser.Plugin.Isometric.Point3) {
+	private _onTap = (tapCoords: Phaser.Plugin.Isometric.Point3) => {
 		//TODO: //this.unitController.move(this.unit, tile.isoX/this.config.cellSize, tile.isoY/this.config.cellSize);
-		var tileClicked = this.isoGridGroup.find(t =>  t.isoBounds.containsXY(tapCoords.x, tapCoords.y));
-		if(!!tileClicked) {
-			this.activeTile.active = false;
-			tileClicked.active = true;
-			this.activeTile = tileClicked;
-			this._ctrl.signals[GameEvent.GridCellActivated].dispatch(new GridTile(tileClicked, tileClicked.isoX/this._ctrl.config.cellSize, tileClicked.isoY/this._ctrl.config.cellSize));
+		let cellClicked = this.cells.find(c => c.spr.isoBounds.containsXY(tapCoords.x, tapCoords.y));
+
+		if(!!cellClicked) {
+			if(!!this._activeCell)
+				this._activeCell.active = false;
+			cellClicked.active = true;
+			this._activeCell = cellClicked;
+			this._ctrl.signals[GameEvent.GridCellActivated].dispatch(cellClicked);
 		}
 	}
 }
