@@ -3,9 +3,11 @@ import Game = Phaser.Game;
 import {Unit} from "../../../models/unit";
 import {BaseUnit} from "../../../game_objects/unit";
 import {GameController, GameEvent} from "../controller";
+import {Controller} from "../../interface";
+import {InputController} from "../../input/controller";
 
-export class UnitController {
-	constructor(private _ctrl: GameController) {
+export class UnitController implements Controller {
+	constructor(private _ctrl: GameController, private _input: InputController) {
 		//subscribe to events
 		_ctrl.subscribe(GameEvent.GridCellActivated, _ => {
 			//TODO: do summin
@@ -13,7 +15,11 @@ export class UnitController {
 		});
 	}
 
-	create(unit: Unit): BaseUnit {
+	init() { }
+
+	update() { }
+
+	createUnit(unit: Unit): BaseUnit {
 		let spr = this._ctrl.game.add.isoSprite(unit.x*this._ctrl.config.cellSize, unit.y*this._ctrl.config.cellSize, 0, unit.asset, 0);
 		let unitObj = new BaseUnit(unit, spr);
 		return unitObj;

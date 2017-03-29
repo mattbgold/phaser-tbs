@@ -2,18 +2,21 @@ import * as Phaser from 'phaser'
 import Game = Phaser.Game;
 import {GameConfig} from "../../config";
 import Signal = Phaser.Signal;
+import {Controller} from "../interface";
 
-export class GameController {
+export class GameController implements Controller {
 	game: Game;
-	state: {[key:string]: any}; //global state obj accessible to other controllers
+	state: {[key:string]: any}; // global state obj accessible to other controllers
 	signals: {[key: number]: Signal};
 	config: GameConfig;
 
 	constructor(game:Game, config: GameConfig) {
 		this.config = config;
 		this.game = game;
-
-		this.signals = this.state= {};
+		this.state = {
+		};
+		
+		this.signals = {};
 
 		//TODO: remove this later - POC
 		for(let i in EVENTS) {
@@ -21,6 +24,10 @@ export class GameController {
 		}
 	}
 
+	init(){ }
+
+	update() {
+	}
 
 	/// adds callback to signal, creating the signal if it doesn't exist.
 	subscribe(event: GameEvent, callback: Function) {
