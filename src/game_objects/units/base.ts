@@ -1,12 +1,11 @@
-import * as Phaser from 'phaser';
-import {Unit} from "../models/unit";
+import * as Phaser from 'phaser';;
 import Sprite = Phaser.Sprite;
 import Game = Phaser.Game;
 import IsoSprite = Phaser.Plugin.Isometric.IsoSprite;
-import {Stats} from "../models/stats";
+import {Stats} from "../../models/stats";
+import {Unit} from "../../models/unit";
 
-//TODO: make abstract
-export class BaseUnit implements Unit {
+export abstract class BaseUnit implements Unit {
 	spr: IsoSprite;
 
 	name: string;

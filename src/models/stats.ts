@@ -1,6 +1,8 @@
 export interface Stats {
 	hp: number;
 	attack: number;
-	defense: number;
-	speed: number;
+	armor: number;
+	mov: number;
+	sight: number;
+	cost: number;
 }

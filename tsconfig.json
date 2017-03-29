@@ -14,7 +14,7 @@
     "noImplicitAny": false,
     "isolatedModules": false,
     "forceConsistentCasingInFileNames": true,
-    "noEmitHelpers": true
+    "noEmitHelpers": false
   },
   "exclude": [
     "node_modules",

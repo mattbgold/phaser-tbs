@@ -2,15 +2,18 @@ import * as Phaser from 'phaser';
 import {Controller} from "../interface";
 import Game = Phaser.Game;
 import Signal = Phaser.Signal;
+import Point3 = Phaser.Plugin.Isometric.Point3;
 
 export class InputController implements Controller {
 	private _isDown: boolean;
 	private _isUp: boolean;
 
-	cursorPos: Phaser.Plugin.Isometric.Point3;
+	cursorPos: Point3 = new Point3();
 	signals: {[key: number]: Signal};
 
-	constructor(private _game: Game){}
+	constructor(private _game: Game){
+		this.signals = {};
+	}
 
 	init() {
 
@@ -46,5 +49,6 @@ export class InputController implements Controller {
 export enum InputEvent {
 	MouseDown,
 	MouseUp,
-	Tap
+	Tap,
+	DoubleTap
 }

@@ -3,7 +3,7 @@ import 'p2';
 import * as Phaser from 'phaser';
 import 'phaser-plugin-isometric/dist/phaser-plugin-isometric';
 import Group = Phaser.Group;
-import {BaseUnit} from "./game_objects/unit";
+import {BaseUnit} from "./game_objects/units/base";
 import {GameController} from "./controllers/game/controller";
 import {GameConfig, getConfig} from "./config";
 import {UnitController} from "./controllers/game/unit/controller";

@@ -1,10 +1,11 @@
 import * as Phaser from 'phaser';
 import Game = Phaser.Game;
 import {Unit} from "../../../models/unit";
-import {BaseUnit} from "../../../game_objects/unit";
+import {BaseUnit} from "../../../game_objects/units/base";
 import {GameController, GameEvent} from "../controller";
 import {Controller} from "../../interface";
 import {InputController} from "../../input/controller";
+import {ScoutUnit} from "../../../game_objects/units/scout";
 
 export class UnitController implements Controller {
 	constructor(private _ctrl: GameController, private _input: InputController) {
@@ -21,7 +22,7 @@ export class UnitController implements Controller {
 
 	createUnit(unit: Unit): BaseUnit {
 		let spr = this._ctrl.game.add.isoSprite(unit.x*this._ctrl.config.cellSize, unit.y*this._ctrl.config.cellSize, 0, unit.asset, 0);
-		let unitObj = new BaseUnit(unit, spr);
+		let unitObj = new ScoutUnit(unit, spr);
 		return unitObj;
 	}
 

@@ -4,8 +4,8 @@ export interface Unit {
 	name: string;
 	asset: string;
 
-	x: number;
-	y: number;
+	x?: number;
+	y?: number;
 
 	stats?: Stats
 
