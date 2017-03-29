@@ -9,7 +9,7 @@ export class InputController implements Controller {
 	private _isUp: boolean;
 
 	cursorPos: Point3 = new Point3();
-	signals: {[key: number]: Signal};
+	signals: {[key: number]: Signal} = {};
 
 	constructor(private _game: Game){
 		this.signals = {};
