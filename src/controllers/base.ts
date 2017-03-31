@@ -8,6 +8,7 @@ export abstract class BaseController {
 
 	abstract init(): void;
 	abstract update(): void;
+	abstract render(): void;
 
 	subscribe(event: number, callback: Function) {
 		this._createSignalIfNew(event);

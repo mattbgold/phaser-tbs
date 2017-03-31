@@ -19,9 +19,9 @@ export class ContextMenuController extends BaseController {
 		this._input.subscribe(InputEvent.KeyAttack, this._onKeyAttack);
 	}
 
-	update() {
+	update() { }
 
-	}
+	render() { }
 
 	// ------------------------------------
 	// ---------- EVENT HANDLERS ----------

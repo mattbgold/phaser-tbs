@@ -9,7 +9,6 @@ import {UnitController} from "./controllers/game/unit/controller";
 import {BaseController} from "./controllers/base";
 import container from './inversify.config';
 import Game = Phaser.Game;
-import {GameController} from "./controllers/game/controller";
 import {interfaces} from 'inversify';
 import Factory = interfaces.Factory;
 
@@ -20,6 +19,7 @@ class TbsGame {
 
   constructor() {
     this.game = new Phaser.Game(960, 640, Phaser.AUTO, "content", this);
+
     container.bind<Game>(Game).toConstantValue(this.game);
 
     let factory = container.get<Factory<BaseController[]>>('controllers');
