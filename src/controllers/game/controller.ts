@@ -20,7 +20,7 @@ export class GameController extends BaseController {
 		
 		this.signals = {};
 		
-		for(let i in [0,1,2,3,4]) {
+		for(let i in [0,1,2,3,4, 5, 6, 7, 8]) {
 			this.subscribe(parseInt(i), _ => console.log(GameEvent[parseInt(i)], _));
 		}
 	}
@@ -44,5 +44,8 @@ export enum GameEvent {
 	UnitMoveActionSelected,
 	UnitMove,
 	UnitMoveCompleted,
+	UnitAttackActionSelected,
+	UnitAttack,
+	UnitAttackCompleted,
 	CancelAction
 }

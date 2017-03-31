@@ -12,7 +12,7 @@ export abstract class BaseController {
 		this.signals[event].add(callback);
 	}
 	
-	dispatch(event: number, payload: any) {
+	dispatch(event: number, payload: any = null) {
 		this._createSignalIfNew(event);
 		this.signals[event].dispatch(payload);
 	}

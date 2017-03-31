@@ -10,6 +10,7 @@ import {UnitController} from "./controllers/game/unit/controller";
 import {GridController} from "./controllers/game/grid/controller";
 import {InputController} from "./controllers/input/controller";
 import {BaseController} from "./controllers/base";
+import {ContextMenuController} from "./controllers/game/contextmenu/controller";
 
 class TbsGame {
   game: Phaser.Game;
@@ -25,6 +26,7 @@ class TbsGame {
     this.controllers.push(input);
     this.controllers.push(new UnitController(ctrl, input));
     this.controllers.push(new GridController(ctrl, input));
+    this.controllers.push(new ContextMenuController(ctrl, input));
   }
 
   preload () {
@@ -47,7 +49,7 @@ class TbsGame {
 
     this.controllers.forEach(_ => _.init());
 
-    this.spawnUnits();
+    this._spawnUnits();
   }
 
   render() {
@@ -58,8 +60,8 @@ class TbsGame {
     this.controllers.forEach(_ => _.update());
   }
 
-  //TODO: delete me
-  private spawnUnits(): void {
+  //TODO: delete me at some point
+  private _spawnUnits(): void {
     var unitController = <UnitController>(this.controllers.find(c => c instanceof UnitController));
     unitController.loadUnits(this.config.army.map(x => this.config.units[x]));
   }
