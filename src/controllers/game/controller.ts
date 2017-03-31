@@ -6,15 +6,16 @@ import {BaseController} from "../base";
 
 export class GameController extends BaseController {
 	game: Game;
-	state: {[key:string]: any}; // global state obj accessible to other controllers
 	config: GameConfig;
 
+	private _cache: {[key:string]: any};
+	
 	constructor(game:Game, config: GameConfig) {
 		super();
 		
 		this.config = config;
 		this.game = game;
-		this.state = {
+		this._cache = {
 		};
 		
 		this.signals = {};
@@ -27,6 +28,13 @@ export class GameController extends BaseController {
 	init(){ }
 
 	update() {
+	}
+	
+	set(key: string, obj: any):void {
+		this._cache[key] = obj;
+	}
+	get(key: string) {
+		return this._cache[key];
 	}
 }
 

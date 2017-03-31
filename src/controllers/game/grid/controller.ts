@@ -8,12 +8,14 @@ import {BaseUnit} from "../../../game_objects/units/base";
 
 export class GridController extends BaseController {
 	isoGridGroup: Group;
-	cells: GridCell[] = [];
+	cells: GridCell[];
 
 	private _activeCell: GridCell;
 
 	constructor(private _ctrl: GameController, private _input: InputController) {
 		super();
+		this.cells = [];
+		_ctrl.set('cells', this.cells);
 	}
 
 	init(): void {
@@ -57,6 +59,10 @@ export class GridController extends BaseController {
 		});
 	}
 
+	// ------------------------------------
+	// ---------- EVENT HANDLERS ----------
+	// ------------------------------------
+
 	private _onTap = (tapCoords: Phaser.Plugin.Isometric.Point3) => {
 		let clickedCell = this.cells.find(c => c.spr.isoBounds.containsXY(tapCoords.x, tapCoords.y));
 
@@ -91,23 +97,33 @@ export class GridController extends BaseController {
 		this._highlightCellsInRange(cellUnderUnit, unit.stats.mov)
 	};
 
+	// ---------------------------------------
+	// ---------- HELPER FUNCTIONS -----------
+	// ---------------------------------------
+
 	//TODO: use this fn for attack range, just change tint color
-	private _highlightCellsInRange(cell: GridCell, range: number) {
-		if (!range || !cell) {
+	private _highlightCellsInRange(cell: GridCell, range: number, highlightOccupiedCells: boolean = false) {
+		if (!range || !cell || cell.isObstacle)
 			return;
+
+		if(highlightOccupiedCells || !this._getUnitAt(cell)) {
+			// if the cell is not occupied, highlight it
+			cell.highlighted = true;
+
+			if (!cell.active)
+				cell.spr.tint = highlightColor;
 		}
-
-		//TODO: also return here if it is an obstacle, but if it is a unit we need to not highlight but continue the recursion (i.e. the cell can me moved through but its already occupied)
-
-		cell.highlighted = true;
-
-		if(!cell.active)
-			cell.spr.tint = highlightColor;
 
 		this._highlightCellsInRange(this.cells.find(c => c.x === cell.x + 1 && c.y === cell.y), range - 1);
 		this._highlightCellsInRange(this.cells.find(c => c.x === cell.x - 1 && c.y === cell.y), range - 1);
 		this._highlightCellsInRange(this.cells.find(c => c.x === cell.x && c.y === cell.y + 1), range - 1);
 		this._highlightCellsInRange(this.cells.find(c => c.x === cell.x && c.y === cell.y - 1), range - 1);
+	}
+
+	private _getUnitAt(cell: GridCell): BaseUnit {
+		let units: BaseUnit[] = this._ctrl.get('units');
+
+		return units.find(unit => unit.x === cell.x && unit.y === cell.y)
 	}
 }
 

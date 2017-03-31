@@ -9,6 +9,8 @@ export class GridCell {
 	active: boolean;
 	highlighted: boolean;
 	
+	isObstacle: boolean;
+	
 	constructor(spr: IsoSprite, x: number, y: number) {
 		this.x = x;
 		this.y = y;

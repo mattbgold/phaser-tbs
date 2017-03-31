@@ -21,9 +21,11 @@ export class UnitController extends BaseController {
 	
 	constructor(private _ctrl: GameController, private _input: InputController) {
 		super();
+		this.units = [];
+		_ctrl.set('units', this.units);
 	}
 
-	units: BaseUnit[] = [];
+	units: BaseUnit[];
 
 	init() {
 		this._ctrl.subscribe(GameEvent.GridCellActivated, this._onCellActivated);
@@ -40,14 +42,6 @@ export class UnitController extends BaseController {
 			unit.y = 0;
 			this._createUnit(unit)
 		});
-	}
-	
-	private _createUnit(unit: Unit): BaseUnit {
-		let spr = this._ctrl.game.add.isoSprite(unit.x*this._ctrl.config.cellSize, unit.y*this._ctrl.config.cellSize, 0, unit.asset, 0);
-		let unitObj = new (this.unitTypeMap[unit.name])(unit, spr);
-
-		this.units.push(unitObj);
-		return unitObj;
 	}
 
 	move(unit: BaseUnit, x, y): void {
@@ -73,8 +67,9 @@ export class UnitController extends BaseController {
 			movementX.chain(movementY).start();
 		}
 
-	
-	// ---------- event handlers ----------
+	// ------------------------------------
+	// ---------- EVENT HANDLERS ----------
+	// ------------------------------------
 	
 	private _onCellActivated = (cell: GridCell): void => {
 		let unitAtCell  = this.units.find(unit => unit.x == cell.x && unit.y == cell.y);
@@ -91,6 +86,17 @@ export class UnitController extends BaseController {
 		this._selectedUnit = null;
 	}
 	
+	// ---------------------------------------
+	// ---------- HELPER FUNCTIONS  ----------
+	// ---------------------------------------
+	
+	private _createUnit(unit: Unit): BaseUnit {
+		let spr = this._ctrl.game.add.isoSprite(unit.x*this._ctrl.config.cellSize, unit.y*this._ctrl.config.cellSize, 0, unit.asset, 0);
+		let unitObj = new (this.unitTypeMap[unit.name])(unit, spr);
+
+		this.units.push(unitObj);
+		return unitObj;
+	}
 	//TODO: we need some kind of TurnExecutor to run the turn in sequence.
 	// for the team in action phase, execute the moves and actions one at a time
 }
