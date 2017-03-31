@@ -14,6 +14,8 @@ export abstract class BaseUnit implements Unit {
 	x: number;
 	y: number;
 
+	hp: number;
+
 	stats: Stats;
 
 	abilities: any[];
@@ -41,5 +43,9 @@ export abstract class BaseUnit implements Unit {
 	setYPosition(y): void {
 		this.spr.scale.x = Math.sign(y - this.y) || 1;
 		this.y = y;
+	}
+
+	get isDead(): boolean {
+		return this.hp <= 0;
 	}
 }

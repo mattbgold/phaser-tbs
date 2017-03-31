@@ -1,4 +1,5 @@
 import * as Phaser from 'phaser';
+import {injectable} from "inversify";
 import {GameController, GameEvent} from "../controller";
 import {GridCell} from "../../../game_objects/grid_cell";
 import {InputController, InputEvent} from "../../input/controller";
@@ -6,6 +7,7 @@ import {BaseController} from "../../base";
 import Group = Phaser.Group;
 import {BaseUnit} from "../../../game_objects/units/base";
 
+@injectable()
 export class GridController extends BaseController {
 	isoGridGroup: Group;
 	cells: GridCell[];

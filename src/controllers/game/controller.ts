@@ -1,24 +1,22 @@
 import * as Phaser from 'phaser'
+import {injectable, inject} from "inversify";
 import Game = Phaser.Game;
 import {GameConfig} from "../../config";
 import Signal = Phaser.Signal;
 import {BaseController} from "../base";
 
+@injectable()
 export class GameController extends BaseController {
 	game: Game;
 	config: GameConfig;
 
-	private _cache: {[key:string]: any};
+	private _cache: {[key:string]: any} = {};
 	
-	constructor(game:Game, config: GameConfig) {
+	constructor(game:Game, @inject('config')config: GameConfig) {
 		super();
 		
 		this.config = config;
 		this.game = game;
-		this._cache = {
-		};
-		
-		this.signals = {};
 		
 		for(let i in [0,1,2,3,4, 5, 6, 7, 8]) {
 			this.subscribe(parseInt(i), _ => console.log(GameEvent[parseInt(i)], _));

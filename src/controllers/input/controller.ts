@@ -1,10 +1,12 @@
 import * as Phaser from 'phaser';
+import {injectable} from "inversify";
 import Game = Phaser.Game;
 import Signal = Phaser.Signal;
 import Point3 = Phaser.Plugin.Isometric.Point3;
 import {BaseController} from "../base";
 import Key = Phaser.Key;
 
+@injectable()
 export class InputController extends BaseController {
 	private _isMouseDown: boolean;
 	private _attackKey: Key; //TODO: move all shortcut keys to a map

@@ -1,16 +1,17 @@
+import "reflect-metadata";
 import 'pixi';
 import 'p2';
 import * as Phaser from 'phaser';
 import 'phaser-plugin-isometric/dist/phaser-plugin-isometric';
 import Group = Phaser.Group;
-import {BaseUnit} from "./game_objects/units/base";
-import {GameController} from "./controllers/game/controller";
 import {GameConfig, getConfig} from "./config";
 import {UnitController} from "./controllers/game/unit/controller";
-import {GridController} from "./controllers/game/grid/controller";
-import {InputController} from "./controllers/input/controller";
 import {BaseController} from "./controllers/base";
-import {ContextMenuController} from "./controllers/game/contextmenu/controller";
+import container from './inversify.config';
+import Game = Phaser.Game;
+import {GameController} from "./controllers/game/controller";
+import {interfaces} from 'inversify';
+import Factory = interfaces.Factory;
 
 class TbsGame {
   game: Phaser.Game;
@@ -19,14 +20,10 @@ class TbsGame {
 
   constructor() {
     this.game = new Phaser.Game(960, 640, Phaser.AUTO, "content", this);
-    this.config = getConfig();
-    let ctrl = new GameController(this.game, this.config);
-    let input = new InputController(this.game);
-    this.controllers.push(ctrl);
-    this.controllers.push(input);
-    this.controllers.push(new UnitController(ctrl, input));
-    this.controllers.push(new GridController(ctrl, input));
-    this.controllers.push(new ContextMenuController(ctrl, input));
+    container.bind<Game>(Game).toConstantValue(this.game);
+
+    let factory = container.get<Factory<BaseController[]>>('controllers');
+    this.controllers = <BaseController[]>factory();
   }
 
   preload () {
@@ -63,7 +60,8 @@ class TbsGame {
   //TODO: delete me at some point
   private _spawnUnits(): void {
     var unitController = <UnitController>(this.controllers.find(c => c instanceof UnitController));
-    unitController.loadUnits(this.config.army.map(x => this.config.units[x]));
+    let config = getConfig();
+    unitController.loadUnits(config.army.map(x => config.units[x]));
   }
 }
 

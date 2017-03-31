@@ -1,6 +1,8 @@
+import {injectable} from "inversify";
 import * as Phaser from 'phaser';
 import Signal = Phaser.Signal;
 
+@injectable()
 export abstract class BaseController {
 	protected signals: {[key: number]: Signal} = {};
 

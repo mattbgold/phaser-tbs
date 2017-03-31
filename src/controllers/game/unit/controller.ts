@@ -1,4 +1,5 @@
 import * as Phaser from 'phaser';
+import {injectable} from "inversify";
 import Game = Phaser.Game;
 import {Unit} from "../../../models/unit";
 import {BaseUnit} from "../../../game_objects/units/base";
@@ -10,6 +11,8 @@ import {BaseController} from "../../base";
 import {TankUnit} from "../../../game_objects/units/tank";
 import {AssaultUnit} from "../../../game_objects/units/assault";
 
+
+@injectable()
 export class UnitController extends BaseController {
 	private unitTypeMap: {[key:string]: any} = {
 	'scout': ScoutUnit,
@@ -66,7 +69,14 @@ export class UnitController extends BaseController {
 
 	private _onUnitMove = (cell: GridCell): void => {
 		this._moveUnit(this._selectedUnit, cell.x, cell.y);
-	}
+	};
+	
+	private _onUnitAttack = (defendingUnit: BaseUnit): void => {
+		if (!this._selectedUnit)
+			console.error('Cannot attack, no unit selected!', defendingUnit);
+		
+		this._handleCombat(this._selectedUnit, defendingUnit);
+	};
 	
 	// ---------------------------------------
 	// ---------- HELPER FUNCTIONS  ----------
@@ -96,6 +106,17 @@ export class UnitController extends BaseController {
 		}
 	}
 
+	private _handleCombat(attackingUnit: BaseUnit, defendingUnit: BaseUnit): void {
+		let damage = attackingUnit.stats.attack - defendingUnit.stats.armor;
+		if(!damage) return;
+		
+		defendingUnit.hp -= damage;
+		
+		if(defendingUnit.isDead) {
+			defendingUnit.spr.kill();
+		}
+	}
+	
 	private _createUnit(unit: Unit): BaseUnit {
 		let spr = this._ctrl.game.add.isoSprite(unit.x*this._ctrl.config.cellSize, unit.y*this._ctrl.config.cellSize, 0, unit.asset, 0);
 		let unitObj = new (this.unitTypeMap[unit.name])(unit, spr);

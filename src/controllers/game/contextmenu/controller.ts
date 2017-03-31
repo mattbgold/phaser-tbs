@@ -1,8 +1,10 @@
+import {injectable} from "inversify";
 import {GameController, GameEvent} from "../controller";
 import {InputController, InputEvent} from "../../input/controller";
 import {BaseController} from "../../base";
 import {BaseUnit} from "../../../game_objects/units/base";
 
+@injectable()
 export class ContextMenuController extends BaseController {
 
 	private _selectedUnit: BaseUnit;
