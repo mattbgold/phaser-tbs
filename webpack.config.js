@@ -10,7 +10,7 @@ var pixi = path.join(phaserModule, 'build/custom/pixi.js');
 var p2 = path.join(phaserModule, 'build/custom/p2.js');
 
 module.exports = {
-  entry: './src/index.ts',
+  entry: ['./src/index.ts', 'reflect-metadata/Reflect'],
   output: {
     pathInfo: true,
     filename: '[name].bundle.js',
@@ -29,6 +29,9 @@ module.exports = {
       inject: 'body',
     }),
     new webpack.NoErrorsPlugin(),
+  ],
+  noParse: [
+    /reflect-metadata/,
   ],
   module: {
     loaders: [
