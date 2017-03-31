@@ -42,6 +42,7 @@ export enum GameEvent {
 	GridCellActivated,
 	UnitSelected,
 	UnitMoveActionSelected,
-	UnitMoved,
+	UnitMove,
+	UnitMoveCompleted,
 	CancelAction
 }

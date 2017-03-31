@@ -30,6 +30,7 @@ export class UnitController extends BaseController {
 	init() {
 		this._ctrl.subscribe(GameEvent.GridCellActivated, this._onCellActivated);
 		this._ctrl.subscribe(GameEvent.CancelAction, this._onCancelAction);
+		this._ctrl.subscribe(GameEvent.UnitMove, this._onUnitMove);
 	}
 
 	update() { }
@@ -56,7 +57,7 @@ export class UnitController extends BaseController {
 		var movementY = this._ctrl.game.add.tween(unit.spr)
 			.to({ isoY: y * this._ctrl.config.cellSize }, Math.abs(unit.y - y)*150, Phaser.Easing.Quadratic.Out);
 
-		movementY.onComplete.add(() => this._ctrl.dispatch(GameEvent.UnitMoved, unit));
+		movementY.onComplete.add(() => this._ctrl.dispatch(GameEvent.UnitMoveCompleted, unit));
 
 		unit.setXPosition(x);
 
@@ -84,6 +85,10 @@ export class UnitController extends BaseController {
 
 	private _onCancelAction = (): void => {
 		this._selectedUnit = null;
+	};
+
+	private _onUnitMove = (cell: GridCell): void => {
+		this.move(this._selectedUnit, cell.x, cell.y);
 	}
 	
 	// ---------------------------------------

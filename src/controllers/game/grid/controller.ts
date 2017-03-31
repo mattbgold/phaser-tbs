@@ -11,6 +11,7 @@ export class GridController extends BaseController {
 	cells: GridCell[];
 
 	private _activeCell: GridCell;
+	private _highlightCellsForMove: BaseUnit;
 
 	constructor(private _ctrl: GameController, private _input: InputController) {
 		super();
@@ -71,21 +72,24 @@ export class GridController extends BaseController {
 				this._activeCell.active = false;
 				this._activeCell.spr.tint = 0xffffff;
 			}
-			clickedCell.active = true;
-			clickedCell.spr.tint = 0x5555FF;
-			this._activeCell = clickedCell;
-			this._ctrl.dispatch(GameEvent.CancelAction, clickedCell);
-			this._ctrl.dispatch(GameEvent.GridCellActivated, clickedCell);
+
+			if (!!this._highlightCellsForMove && clickedCell.highlighted) {
+				this._unhighlightAll();
+				this._ctrl.dispatch(GameEvent.UnitMove, clickedCell);
+			}
+			else {
+				clickedCell.active = true;
+				clickedCell.spr.tint = 0x5555FF;
+				this._activeCell = clickedCell;
+
+				this._ctrl.dispatch(GameEvent.CancelAction, clickedCell);
+				this._ctrl.dispatch(GameEvent.GridCellActivated, clickedCell);
+			}
 		}
 	}
 
 	private _onCancelAction = () => {
-		//unhighlight all cells
-		this.cells.filter(cell => cell.highlighted).forEach(cell => {
-			cell.highlighted = false;
-			if(!cell.active)
-				cell.spr.tint = 0xffffff;
-		})
+		this._unhighlightAll();
 	}
 
 	private _onMoveActionSelected = (unit: BaseUnit) => {
@@ -94,12 +98,24 @@ export class GridController extends BaseController {
 		if(!cellUnderUnit)
 			return;
 
+		this._highlightCellsForMove = unit;
+		
 		this._highlightCellsInRange(cellUnderUnit, unit.stats.mov)
 	};
 
 	// ---------------------------------------
 	// ---------- HELPER FUNCTIONS -----------
 	// ---------------------------------------
+
+	private _unhighlightAll(): void {
+		this._highlightCellsForMove = null;
+		
+		this.cells.filter(cell => cell.highlighted).forEach(cell => {
+			cell.highlighted = false;
+			if(!cell.active)
+				cell.spr.tint = 0xffffff;
+		});
+	}
 
 	//TODO: use this fn for attack range, just change tint color
 	private _highlightCellsInRange(cell: GridCell, range: number, highlightOccupiedCells: boolean = false) {
