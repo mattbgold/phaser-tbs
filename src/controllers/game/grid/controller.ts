@@ -47,17 +47,23 @@ export class GridController extends BaseController {
 			if (inBounds) {
 				if (!cell.hover) {
 					cell.hover = true;
-					if(!cell.highlighted && !cell.active)
+					if(!cell.highlighted && !cell.active) {
 						cell.spr.tint = highlightHoverColor;
-					this._ctrl.game.add.tween(cell.spr).to({ isoZ: 4 }, 200, Phaser.Easing.Quadratic.InOut, true);
+					}
+					this._ctrl.game.add.tween(cell.spr).to({isoZ: 4}, 200, Phaser.Easing.Quadratic.InOut, true);
 				}
 			}
 			// If not, revert back to how it was.
-			else if (cell.hover && !inBounds) {
+			else if ((cell.hover) && !inBounds) {
 				cell.hover = false;
-				if(!cell.highlighted && !cell.active)
+				if(!cell.highlighted && !cell.active) {
 					cell.spr.tint = 0xffffff;
-				this._ctrl.game.add.tween(cell.spr).to({ isoZ: 0 }, 200, Phaser.Easing.Quadratic.InOut, true);
+				}
+				if(!cell.active) // do not lower the cell if its active
+				this._ctrl.game.add.tween(cell.spr).to({isoZ: 0}, 200, Phaser.Easing.Quadratic.InOut, true);
+			}
+			else if (!cell.hover && !cell.active && cell.spr.isoZ === 4) { // clean up active cells after deactivation
+				this._ctrl.game.add.tween(cell.spr).to({isoZ: 0}, 200, Phaser.Easing.Quadratic.InOut, true);
 			}
 		});
 	}
@@ -80,7 +86,6 @@ export class GridController extends BaseController {
 
 			// if we tapped a destination cell for MOVE action
 			if (!!this._highlightCellsForMove && clickedCell.highlighted) {
-
 				this._unhighlightAll()
 				this._ctrl.dispatch(GameEvent.UnitMove, clickedCell);
 			}
@@ -94,7 +99,7 @@ export class GridController extends BaseController {
 			else {
 				// mark the tapped cell as active
 				clickedCell.active = true;
-				clickedCell.spr.tint = 0x5555FF;
+				clickedCell.spr.tint = 0xFFFF88;
 				this._activeCell = clickedCell;
 
 				// we didn't tap a cell for an action, so lets cancel any pending actions
@@ -175,6 +180,6 @@ export class GridController extends BaseController {
 	}
 }
 
-const highlightHoverColor = 0x86bfda;
+const highlightHoverColor = 0xdddddd;
 const highlightMoveColor = 0x86bfda;
 const highlightAttackColor = 0xdc5566;
