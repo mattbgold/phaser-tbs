@@ -5,6 +5,7 @@ export interface GameConfig {
 	gridSizeY: number;
 	cellSize: number;
 	units: {[key:string]: Unit};
+	army: string[];
 };
 
 export function getConfig(): GameConfig {
@@ -12,6 +13,7 @@ export function getConfig(): GameConfig {
 		gridSizeX: 10,
 		gridSizeY: 8,
 		cellSize: 38,
+		army: ['scout', 'scout', 'assault', 'tank'],
 		units: {
 			'scout': {
 				name: 'scout',
@@ -21,6 +23,7 @@ export function getConfig(): GameConfig {
 					armor: 0,
 					hp: 4,
 					mov: 5,
+					range: 3,
 					sight: 5,
 					cost: 2
 				},
@@ -33,6 +36,7 @@ export function getConfig(): GameConfig {
 					armor: 0,
 					hp: 5,
 					mov: 3,
+					range: 3,
 					sight: 4,
 					cost: 3
 				},
@@ -45,6 +49,7 @@ export function getConfig(): GameConfig {
 					armor: 2,
 					hp: 4,
 					mov: 4,
+					range: 5,
 					sight: 3,
 					cost: 6
 				},

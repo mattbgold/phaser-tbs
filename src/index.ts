@@ -8,13 +8,12 @@ import {GameController} from "./controllers/game/controller";
 import {GameConfig, getConfig} from "./config";
 import {UnitController} from "./controllers/game/unit/controller";
 import {GridController} from "./controllers/game/grid/controller";
-import {Controller} from "./controllers/interface";
 import {InputController} from "./controllers/input/controller";
+import {BaseController} from "./controllers/base";
 
 class TbsGame {
   game: Phaser.Game;
-  controllers: Controller[] = [];
-  unit: BaseUnit; //TODO: remove me
+  controllers: BaseController[] = [];
   config: GameConfig;
 
   constructor() {
@@ -62,12 +61,7 @@ class TbsGame {
   //TODO: delete me
   private spawnUnits(): void {
     var unitController = <UnitController>(this.controllers.find(c => c instanceof UnitController));
-    this.unit = unitController.createUnit({
-      name: 'test',
-      asset: 'unit',
-      x: 4,
-      y: 8
-    });
+    unitController.loadUnits(this.config.army.map(x => this.config.units[x]));
   }
 }
 

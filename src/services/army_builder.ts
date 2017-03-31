@@ -1,5 +1,9 @@
 import {Unit} from "../models/unit";
 import {GameConfig} from "../config";
+import {BaseUnit} from "../game_objects/units/base";
+import {ScoutUnit} from "../game_objects/units/scout";
+import {AssaultUnit} from "../game_objects/units/assault";
+import {TankUnit} from "../game_objects/units/tank";
 
 export class ArmyBuilder {
 	private _units: Unit[];
@@ -23,6 +27,7 @@ export class ArmyBuilder {
 	}
 
 	build() {
-		//TODO: add to game as game objects?
+		
 	}
 }
+

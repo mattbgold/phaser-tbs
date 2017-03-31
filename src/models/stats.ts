@@ -3,6 +3,7 @@ export interface Stats {
 	attack: number;
 	armor: number;
 	mov: number;
+	range: number;
 	sight: number;
 	cost: number;
 }
