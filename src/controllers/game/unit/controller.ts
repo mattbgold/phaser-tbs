@@ -45,29 +45,6 @@ export class UnitController extends BaseController {
 		});
 	}
 
-	move(unit: BaseUnit, x, y): void {
-		let skipXAnimation = x === unit.x;
-		let skipYAnimation = y === unit.y;
-
-		var movementX = this._ctrl.game.add.tween(unit.spr)
-			.to({ isoX: x * this._ctrl.config.cellSize }, Math.abs(unit.x - x)*150, skipYAnimation ? Phaser.Easing.Quadratic.Out : Phaser.Easing.Linear.None);
-
-		movementX.onComplete.add(() => unit.setYPosition(y));
-
-		var movementY = this._ctrl.game.add.tween(unit.spr)
-			.to({ isoY: y * this._ctrl.config.cellSize }, Math.abs(unit.y - y)*150, Phaser.Easing.Quadratic.Out);
-
-		movementY.onComplete.add(() => this._ctrl.dispatch(GameEvent.UnitMoveCompleted, unit));
-
-		unit.setXPosition(x);
-
-		if(skipXAnimation) {
-			unit.setYPosition(y)
-			movementY.start();
-		} else
-			movementX.chain(movementY).start();
-		}
-
 	// ------------------------------------
 	// ---------- EVENT HANDLERS ----------
 	// ------------------------------------
@@ -88,13 +65,37 @@ export class UnitController extends BaseController {
 	};
 
 	private _onUnitMove = (cell: GridCell): void => {
-		this.move(this._selectedUnit, cell.x, cell.y);
+		this._moveUnit(this._selectedUnit, cell.x, cell.y);
 	}
 	
 	// ---------------------------------------
 	// ---------- HELPER FUNCTIONS  ----------
 	// ---------------------------------------
-	
+
+	private _moveUnit(unit: BaseUnit, x, y): void {
+		let skipXAnimation = x === unit.x;
+		let skipYAnimation = y === unit.y;
+
+		var movementX = this._ctrl.game.add.tween(unit.spr)
+			.to({ isoX: x * this._ctrl.config.cellSize }, Math.abs(unit.x - x)*150, skipYAnimation ? Phaser.Easing.Quadratic.Out : Phaser.Easing.Linear.None);
+
+		movementX.onComplete.add(() => unit.setYPosition(y));
+
+		var movementY = this._ctrl.game.add.tween(unit.spr)
+			.to({ isoY: y * this._ctrl.config.cellSize }, Math.abs(unit.y - y)*150, Phaser.Easing.Quadratic.Out);
+
+		movementY.onComplete.add(() => this._ctrl.dispatch(GameEvent.UnitMoveCompleted, unit));
+
+		unit.setXPosition(x);
+
+		if(skipXAnimation) {
+			unit.setYPosition(y)
+			movementY.start();
+		} else {
+			movementX.chain(movementY).start();
+		}
+	}
+
 	private _createUnit(unit: Unit): BaseUnit {
 		let spr = this._ctrl.game.add.isoSprite(unit.x*this._ctrl.config.cellSize, unit.y*this._ctrl.config.cellSize, 0, unit.asset, 0);
 		let unitObj = new (this.unitTypeMap[unit.name])(unit, spr);
