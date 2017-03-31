@@ -70,6 +70,8 @@ export class GridController extends BaseController {
 		});
 	}
 
+	render(){ }
+	
 	// ------------------------------------
 	// ---------- EVENT HANDLERS ----------
 	// ------------------------------------

@@ -23,10 +23,11 @@ export class GameController extends BaseController {
 		}
 	}
 
-	init(){ }
+	init() {}
 
-	update() {
-	}
+	update() {}
+	
+	render() {}
 	
 	set(key: string, obj: any):void {
 		this._cache[key] = obj;

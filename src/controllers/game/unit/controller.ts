@@ -38,6 +38,8 @@ export class UnitController extends BaseController {
 
 	update() { }
 
+	render() { }
+	
 	loadUnits(units: Unit[]) {
 		let xx = 0;
 

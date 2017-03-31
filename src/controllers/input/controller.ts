@@ -48,6 +48,8 @@ export class InputController extends BaseController {
 		}
 	}
 
+	render(){}
+	
 	private _initKey(keyCode: number): Key {
 		let key = this._game.input.keyboard.addKey(keyCode);
 		this._game.input.keyboard.addKeyCapture([keyCode])
