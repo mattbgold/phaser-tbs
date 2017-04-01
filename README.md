@@ -4,5 +4,5 @@ Clone this project in any directory and type `npm install` to install all depend
 
 And to distribute your game just run `npm build` it will create the `dist` directory with all necessary files, ready to push to any HTTP server.
 
-### License MIT
+
 Boilerplate copied from [Phaser TypeScript Webpack Boilerplate](https://github.com/eduardonunesp/phaser-typescript-webpack-boilerplate)
