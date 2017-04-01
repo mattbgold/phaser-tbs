@@ -93,15 +93,14 @@ export class UnitController extends BaseController {
 
 	private _moveUnit(unit: BaseUnit, x, y): void {
 		let skipXAnimation = x === unit.x;
-		let skipYAnimation = y === unit.y;
-
+		
 		var movementX = this._ctrl.game.add.tween(unit.spr)
-			.to({ isoX: x * this._ctrl.config.cellSize }, Math.abs(unit.x - x)*150, skipYAnimation ? Phaser.Easing.Quadratic.Out : Phaser.Easing.Linear.None);
+			.to({ isoX: x * this._ctrl.config.cellSize }, Math.abs(unit.x - x)*150, Phaser.Easing.Linear.None);
 
 		movementX.onComplete.add(() => unit.setYPosition(y));
 
 		var movementY = this._ctrl.game.add.tween(unit.spr)
-			.to({ isoY: y * this._ctrl.config.cellSize }, Math.abs(unit.y - y)*150, Phaser.Easing.Quadratic.Out);
+			.to({ isoY: y * this._ctrl.config.cellSize }, Math.abs(unit.y - y)*150, Phaser.Easing.Linear.None);
 
 		movementY.onComplete.add(() => this._ctrl.dispatch(GameEvent.UnitMoveCompleted, unit));
 
