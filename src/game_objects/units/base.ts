@@ -51,6 +51,12 @@ export abstract class BaseUnit implements Unit {
 		this.y = y;
 	}
 
+	pointToUnit(other: BaseUnit): void {
+		let sign = Math.sign(this.spr.x - other.spr.x);
+		if (sign !== 0)
+			this.spr.scale.x = sign;
+	}
+
 	get isDead(): boolean {
 		return this.hp <= 0;
 	}

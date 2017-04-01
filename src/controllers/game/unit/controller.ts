@@ -93,7 +93,7 @@ export class UnitController extends BaseController {
 
 	private _moveUnit(unit: BaseUnit, x, y): void {
 		let skipXAnimation = x === unit.x;
-		
+
 		var movementX = this._ctrl.game.add.tween(unit.spr)
 			.to({ isoX: x * this._ctrl.config.cellSize }, Math.abs(unit.x - x)*150, Phaser.Easing.Linear.None);
 
@@ -116,14 +116,34 @@ export class UnitController extends BaseController {
 
 	private _handleCombat(attackingUnit: BaseUnit, defendingUnit: BaseUnit): void {
 		let damage = attackingUnit.stats.attack - defendingUnit.stats.armor;
-		if(!damage) return;
-		
-		defendingUnit.hp -= damage;
-		
-		if(defendingUnit.isDead) {
-			this._deadUnits.push(this.units.splice(this.units.indexOf(defendingUnit), 1)[0]);
-			defendingUnit.spr.kill();
+
+		//face each other
+		attackingUnit.pointToUnit(defendingUnit);
+		defendingUnit.pointToUnit(attackingUnit);
+
+		let attackerAnimation = this._ctrl.game.add.tween(attackingUnit.spr).to({isoX:attackingUnit.spr.isoX + 2}, 50, Phaser.Easing.Elastic.InOut, true, 0, 4, true);
+		if (damage) {
+			let defenderAnimation = this._ctrl.game.add.tween(defendingUnit.spr).to({}, 50, null, true, 0, 10);
+			defenderAnimation.onRepeat.add(() => defendingUnit.spr.tint = defendingUnit.spr.tint === 0xff0000 ? 0xffffff : 0xff0000);
 		}
+		
+		attackerAnimation.onComplete.add(() => {
+			if(!damage) return;
+
+			defendingUnit.hp -= damage;
+
+			if(defendingUnit.isDead) {
+				this._deadUnits.push(this.units.splice(this.units.indexOf(defendingUnit), 1)[0]);
+
+				//TODO: remove this later
+				let explosion = this._ctrl.game.add.sprite(defendingUnit.spr.x, defendingUnit.spr.y, 'explosion');
+				explosion.anchor.set(.5, .5);
+				explosion.scale.set(.5, .5);
+				explosion.animations.add('explode');
+				explosion.animations.play('explode', 30, false, true);
+				defendingUnit.spr.kill();
+			}
+		});
 	}
 	
 	private _createUnit(unit: Unit): BaseUnit {

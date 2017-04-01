@@ -15,6 +15,7 @@ export class GridController extends BaseController {
 	private _activeCell: GridCell;
 	private _highlightCellsForMove: BaseUnit;
 	private _highlightCellsForAttack: BaseUnit;
+	private _canActivateCells: boolean = true;
 
 	constructor(private _ctrl: GameController, private _input: InputController) {
 		super();
@@ -27,7 +28,9 @@ export class GridController extends BaseController {
 		this._ctrl.subscribe(GameEvent.UnitMoveActionSelected, this._onMoveActionSelected);
 		this._ctrl.subscribe(GameEvent.UnitAttackActionSelected, this._onAttackActionSelected);
 		this._ctrl.subscribe(GameEvent.CancelAction, this._onCancelAction);
-		
+		this._ctrl.subscribe(GameEvent.UnitMove, () => this._canActivateCells = false);
+		this._ctrl.subscribe(GameEvent.UnitMoveCompleted, () => this._canActivateCells = true);
+
 		this.isoGridGroup = this._ctrl.game.add.group();
 
 		for (let xx = 0; xx < this._ctrl.config.gridSizeX; xx++) {
@@ -87,6 +90,9 @@ export class GridController extends BaseController {
 	// ------------------------------------
 
 	private _onTap = (tapCoords: Phaser.Plugin.Isometric.Point3) => {
+		if (!this._canActivateCells)
+			return;
+
 		let clickedCell = this.cells.find(c => c.spr.isoBounds.containsXY(tapCoords.x, tapCoords.y));
 		if(!clickedCell)
 			return;

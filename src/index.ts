@@ -30,6 +30,7 @@ class TbsGame {
   preload () {
     //assets
     this.game.load.image("tile", "./assets/images/cube.png");
+    this.game.load.spritesheet('explosion', './assets/images/sprites/explosion.png',130, 130, 39);
     for(let name in this.config.units) {
       let asset = this.config.units[name].asset;
       this.game.load.image(asset, `./assets/images/${asset}.gif`)
