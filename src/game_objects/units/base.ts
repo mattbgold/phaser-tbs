@@ -22,7 +22,7 @@ export abstract class BaseUnit implements Unit {
 	
 	constructor(model: Unit, spr: IsoSprite) {
 		this.spr = spr;
-		this.spr.anchor.set(.5, .7);
+		this.spr.anchor.set(.5, .5);
 		
 		this.init(model);
 	}
@@ -34,14 +34,20 @@ export abstract class BaseUnit implements Unit {
 		this.y = unit.y;
 		this.stats = unit.stats;
 		this.abilities = unit.abilities;
+
+		this.hp = unit.stats.hp;
 	}
 	
 	setXPosition(x): void {
-		this.spr.scale.x = Math.sign(this.x - x);
+		let sign = Math.sign(this.x - x);
+		if (sign !== 0)
+			this.spr.scale.x = sign;
 		this.x = x;
 	}
 	setYPosition(y): void {
-		this.spr.scale.x = Math.sign(y - this.y) || 1;
+		let sign = Math.sign(y - this.y);
+		if (sign !== 0)
+			this.spr.scale.x = sign;
 		this.y = y;
 	}
 

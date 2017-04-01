@@ -23,13 +23,17 @@ class TbsGame {
     container.bind<Game>(Game).toConstantValue(this.game);
 
     let factory = container.get<Factory<BaseController[]>>('controllers');
+    this.config = container.get<GameConfig>('config');
     this.controllers = <BaseController[]>factory();
   }
 
   preload () {
     //assets
     this.game.load.image("tile", "./assets/images/cube.png");
-    this.game.load.image("unit", "./assets/images/unit.png");
+    for(let name in this.config.units) {
+      let asset = this.config.units[name].asset;
+      this.game.load.image(asset, `./assets/images/${asset}.gif`)
+    }
 
     //game engine settings
     this.game.time.advancedTiming = true;
@@ -42,7 +46,6 @@ class TbsGame {
   }
 
   create() {
-    this.game.input.mouse.capture = true;
 
     this.controllers.forEach(_ => _.init());
 
@@ -50,7 +53,7 @@ class TbsGame {
   }
 
   render() {
-    this.game.debug.text(this.game.time.fps || '--', 2, 14, "#a7aebe");
+    this.controllers.forEach(_ => _.render());
   }
 
   update() {
@@ -60,8 +63,7 @@ class TbsGame {
   //TODO: delete me at some point
   private _spawnUnits(): void {
     var unitController = <UnitController>(this.controllers.find(c => c instanceof UnitController));
-    let config = getConfig();
-    unitController.loadUnits(config.army.map(x => config.units[x]));
+    unitController.loadUnits(this.config.army.map(x => this.config.units[x]));
   }
 }
 

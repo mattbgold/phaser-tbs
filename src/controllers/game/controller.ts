@@ -27,7 +27,9 @@ export class GameController extends BaseController {
 
 	update() {}
 	
-	render() {}
+	render() {
+		this.game.debug.text(this.game.time.fps || '--', 2, 14, "#a7aebe");
+	}
 	
 	set(key: string, obj: any):void {
 		this._cache[key] = obj;

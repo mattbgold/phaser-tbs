@@ -53,6 +53,9 @@ export class GridController extends BaseController {
 						cell.spr.tint = highlightHoverColor;
 					}
 					this._ctrl.game.add.tween(cell.spr).to({isoZ: 4}, 200, Phaser.Easing.Quadratic.InOut, true);
+					let unitToRaise = this._getUnitAt(cell);
+					if (!!unitToRaise)
+						this._ctrl.game.add.tween(unitToRaise.spr).to({isoZ: 4}, 200, Phaser.Easing.Quadratic.InOut, true);
 				}
 			}
 			// If not, revert back to how it was.
@@ -61,11 +64,18 @@ export class GridController extends BaseController {
 				if(!cell.highlighted && !cell.active) {
 					cell.spr.tint = 0xffffff;
 				}
-				if(!cell.active) // do not lower the cell if its active
-				this._ctrl.game.add.tween(cell.spr).to({isoZ: 0}, 200, Phaser.Easing.Quadratic.InOut, true);
+				if(!cell.active) { // do not lower the cell if its active
+					this._ctrl.game.add.tween(cell.spr).to({isoZ: 0}, 200, Phaser.Easing.Quadratic.InOut, true);
+					let unitToLower = this._getUnitAt(cell);
+					if (!!unitToLower)
+						this._ctrl.game.add.tween(unitToLower.spr).to({isoZ: 0}, 200, Phaser.Easing.Quadratic.InOut, true);
+				}
 			}
 			else if (!cell.hover && !cell.active && cell.spr.isoZ === 4) { // clean up active cells after deactivation
 				this._ctrl.game.add.tween(cell.spr).to({isoZ: 0}, 200, Phaser.Easing.Quadratic.InOut, true);
+				let unitToLower = this._getUnitAt(cell);
+				if (!!unitToLower)
+					this._ctrl.game.add.tween(unitToLower.spr).to({isoZ: 0}, 200, Phaser.Easing.Quadratic.InOut, true);
 			}
 		});
 	}
@@ -78,6 +88,10 @@ export class GridController extends BaseController {
 
 	private _onTap = (tapCoords: Phaser.Plugin.Isometric.Point3) => {
 		let clickedCell = this.cells.find(c => c.spr.isoBounds.containsXY(tapCoords.x, tapCoords.y));
+		if(!clickedCell)
+			return;
+
+		let unitAtClickedCell = this._getUnitAt(clickedCell);
 
 		// if we clicked a cell that's not active
 		if(!!clickedCell && this._activeCell !== clickedCell) {
@@ -94,10 +108,9 @@ export class GridController extends BaseController {
 				this._ctrl.dispatch(GameEvent.UnitMove, clickedCell);
 			}
 			// else if we tapped a target cell for ATTACK action
-			else if (!!this._highlightCellsForAttack && clickedCell.highlighted) {
-
+			else if (!!this._highlightCellsForAttack && clickedCell.highlighted && !!unitAtClickedCell) {
 				this._unhighlightAll();
-				this._ctrl.dispatch(GameEvent.UnitAttack, clickedCell);
+				this._ctrl.dispatch(GameEvent.UnitAttack, unitAtClickedCell);
 			}
 			// else we tapped an inactive cell not tied to any action
 			else {
@@ -125,7 +138,7 @@ export class GridController extends BaseController {
 
 		this._unhighlightAll();
 		this._highlightCellsForMove = unit;
-		this._highlightCellsInRange(cellUnderUnit, unit.stats.mov);
+		this._highlightCellsInRange(cellUnderUnit, unit.stats.mov + 1);
 	};
 
 	private _onAttackActionSelected = (unit: BaseUnit) => {
@@ -136,7 +149,7 @@ export class GridController extends BaseController {
 
 		this._unhighlightAll();
 		this._highlightCellsForAttack = unit;
-		this._highlightCellsInRange(cellUnderUnit, unit.stats.range, true);
+		this._highlightCellsInRange(cellUnderUnit, unit.stats.range + 1, true);
 	};
 
 	// ---------------------------------------

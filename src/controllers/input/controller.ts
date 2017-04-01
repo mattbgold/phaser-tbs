@@ -22,6 +22,7 @@ export class InputController extends BaseController {
 		 // for(let i in [0,1,2,3]) {
 		 // 	this.subscribe(parseInt(i), _ => console.log(InputEvent[parseInt(i)], _));
 		 // }
+		this._game.input.mouse.capture = true;
 		this._attackKey = this._initKey(Phaser.Keyboard.A);
 	}
 

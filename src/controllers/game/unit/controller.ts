@@ -21,7 +21,8 @@ export class UnitController extends BaseController {
 	};
 
 	private _selectedUnit: BaseUnit;
-	
+	private _deadUnits: BaseUnit[] = [];
+
 	constructor(private _ctrl: GameController, private _input: InputController) {
 		super();
 		this.units = [];
@@ -34,11 +35,17 @@ export class UnitController extends BaseController {
 		this._ctrl.subscribe(GameEvent.GridCellActivated, this._onCellActivated);
 		this._ctrl.subscribe(GameEvent.CancelAction, this._onCancelAction);
 		this._ctrl.subscribe(GameEvent.UnitMove, this._onUnitMove);
+		this._ctrl.subscribe(GameEvent.UnitAttack, this._onUnitAttack);
 	}
 
 	update() { }
 
-	render() { }
+	render() {
+		if(!!this._selectedUnit) {
+			this._ctrl.game.debug.text(`${this._selectedUnit.name} HP: ${this._selectedUnit.hp}`, 2, 34, "#a7aebe");
+			this._ctrl.game.debug.text('Base Unit Stats:' + JSON.stringify(this._selectedUnit.stats), 2, 54, "#a7aebe");
+		}
+	}
 	
 	loadUnits(units: Unit[]) {
 		let xx = 0;
@@ -115,6 +122,7 @@ export class UnitController extends BaseController {
 		defendingUnit.hp -= damage;
 		
 		if(defendingUnit.isDead) {
+			this._deadUnits.push(this.units.splice(this.units.indexOf(defendingUnit), 1)[0]);
 			defendingUnit.spr.kill();
 		}
 	}
