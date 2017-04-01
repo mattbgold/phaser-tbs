@@ -48,6 +48,8 @@ class TbsGame {
 
   create() {
 
+    this.game.stage.backgroundColor = '#ddeaff';
+
     this.controllers.forEach(_ => _.init());
 
     this._spawnUnits();

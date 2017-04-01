@@ -123,10 +123,9 @@ export class UnitController extends BaseController {
 
 		let attackerAnimation = this._ctrl.game.add.tween(attackingUnit.spr).to({isoX:attackingUnit.spr.isoX + 2}, 50, Phaser.Easing.Elastic.InOut, true, 0, 4, true);
 		if (damage) {
-			let defenderAnimation = this._ctrl.game.add.tween(defendingUnit.spr).to({}, 50, null, true, 0, 10);
-			defenderAnimation.onRepeat.add(() => defendingUnit.spr.tint = defendingUnit.spr.tint === 0xff0000 ? 0xffffff : 0xff0000);
+			this._ctrl.game.time.events.repeat(50, 10, () => defendingUnit.spr.tint = defendingUnit.spr.tint === 0xff0000 ? 0xffffff : 0xff0000);
 		}
-		
+
 		attackerAnimation.onComplete.add(() => {
 			if(!damage) return;
 
