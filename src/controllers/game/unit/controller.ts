@@ -10,6 +10,7 @@ import {GridCell} from "../../../game_objects/grid_cell";
 import {BaseController} from "../../base";
 import {TankUnit} from "../../../game_objects/units/tank";
 import {AssaultUnit} from "../../../game_objects/units/assault";
+import Tween = Phaser.Tween;
 
 
 @injectable()
@@ -77,7 +78,7 @@ export class UnitController extends BaseController {
 	};
 
 	private _onUnitMove = (cell: GridCell): void => {
-		this._moveUnit(this._selectedUnit, cell);
+		this._moveUnit2(this._selectedUnit, cell);
 	};
 	
 	private _onUnitAttack = (defendingUnit: BaseUnit): void => {
@@ -113,6 +114,51 @@ export class UnitController extends BaseController {
 		} else {
 			movementX.chain(movementY).start();
 		}
+	}
+
+	private _moveUnit2(unit: BaseUnit, targetCell: GridCell): void {
+		let path = targetCell.pathFromActiveCell;
+
+		let tweens: Tween = [];
+		let xx = unit.x;
+		let yy = unit.y
+
+		for(let i in path) {
+			let currentTween;
+
+			switch(path[i]) {
+				case 'up':
+					currentTween = this._ctrl.game.add.tween(unit.spr)
+						.to({ isoY: (--yy) * this._ctrl.config.cellSize }, 150, Phaser.Easing.Linear.None);
+					currentTween.onStart.add(() => unit.setYPosition(unit.y - 1));
+					break;
+				case 'down':
+					currentTween = this._ctrl.game.add.tween(unit.spr)
+						.to({ isoY: (++yy) * this._ctrl.config.cellSize }, 150, Phaser.Easing.Linear.None);
+					currentTween.onStart.add(() => unit.setYPosition(unit.y + 1));
+					break;
+				case 'left':
+					currentTween = this._ctrl.game.add.tween(unit.spr)
+						.to({ isoX: (--xx) * this._ctrl.config.cellSize }, 150, Phaser.Easing.Linear.None);
+					currentTween.onStart.add(() => unit.setXPosition(unit.x - 1));
+					break;
+				case 'right':
+					currentTween = this._ctrl.game.add.tween(unit.spr)
+						.to({ isoX: (++xx) * this._ctrl.config.cellSize }, 150, Phaser.Easing.Linear.None);
+					currentTween.onStart.add(() => unit.setXPosition(unit.x + 1));
+					break;
+				default:
+					console.error('Invalid path');
+			}
+			if(tweens.length) {
+				tweens[tweens.length-1].chain(currentTween);
+			}
+
+			tweens.push(currentTween);
+		}
+
+		tweens[tweens.length - 1].onComplete.add(() => this._ctrl.dispatch(GameEvent.UnitMoveCompleted, unit));
+		tweens[0].start();
 	}
 
 	private _handleCombat(attackingUnit: BaseUnit, defendingUnit: BaseUnit): void {
