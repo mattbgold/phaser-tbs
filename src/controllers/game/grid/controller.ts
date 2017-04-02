@@ -178,7 +178,7 @@ export class GridController extends BaseController {
 		});
 	}
 	
-	private _highlightCellsInRange(cell: GridCell, range: number, isAttack: boolean = false, previousCell: GridCell = null) {
+	private _highlightCellsInRange(cell: GridCell, range: number, isAttack: boolean = false, previousCell: GridCell = null, previousDirection: string = null) {
 		if (!range || !cell || cell.isObstacle
 			|| (cell.active && !!previousCell)) //if we looped back to the original cell, just stop
 			return;
@@ -206,14 +206,15 @@ export class GridController extends BaseController {
 			}
 		}
 
-		if (direction !== 'left')
-			this._highlightCellsInRange(this.cells.find(c => c.x === cell.x + 1 && c.y === cell.y), range - 1, isAttack, cell);
-		if (direction !== 'right')
-			this._highlightCellsInRange(this.cells.find(c => c.x === cell.x - 1 && c.y === cell.y), range - 1, isAttack, cell);
-		if (direction !== 'up')
-			this._highlightCellsInRange(this.cells.find(c => c.x === cell.x && c.y === cell.y + 1), range - 1, isAttack, cell);
-		if (direction !== 'down')
-			this._highlightCellsInRange(this.cells.find(c => c.x === cell.x && c.y === cell.y - 1), range - 1, isAttack, cell);
+
+		if (direction !== 'left' && previousDirection !== 'left') //prevent pointless U-turns
+			this._highlightCellsInRange(this.cells.find(c => c.x === cell.x + 1 && c.y === cell.y), range - 1, isAttack, cell, direction);
+		if (direction !== 'right' && previousDirection !== 'right')
+			this._highlightCellsInRange(this.cells.find(c => c.x === cell.x - 1 && c.y === cell.y), range - 1, isAttack, cell, direction);
+		if (direction !== 'up' && previousDirection !== 'up')
+			this._highlightCellsInRange(this.cells.find(c => c.x === cell.x && c.y === cell.y + 1), range - 1, isAttack, cell, direction);
+		if (direction !== 'down' && previousDirection !== 'down')
+			this._highlightCellsInRange(this.cells.find(c => c.x === cell.x && c.y === cell.y - 1), range - 1, isAttack, cell, direction);
 	}
 
 	private _getUnitAt(cell: GridCell): BaseUnit {
