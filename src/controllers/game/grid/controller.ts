@@ -40,7 +40,7 @@ export class GridController extends BaseController {
 				let tileSpr = this._ctrl.game.add.isoSprite(xx*this._ctrl.config.cellSize, yy*this._ctrl.config.cellSize, 0, 'tile', 0, this.isoGridGroup);
 				tileSpr.anchor.set(0.5, 0);
 				let newCell = new GridCell(tileSpr, xx, yy);
-				if(Math.random() < .3) {newCell.spr.tint = 0x555555; newCell.isObstacle = true;}
+				if(Math.random() < .2) {newCell.spr.tint = 0x555555; newCell.isObstacle = true;}
 				this.cells.push(newCell);
 			}
 		}
@@ -48,6 +48,8 @@ export class GridController extends BaseController {
 	
 	update() {
 		this.cells.forEach(cell =>  {
+			if (cell.isObstacle)
+				return;
 			let inBounds = cell.spr.isoBounds.containsXY(this._input.cursorPos.x, this._input.cursorPos.y);
 
 			//is the mouse hovering over a tile?
@@ -96,7 +98,7 @@ export class GridController extends BaseController {
 			return;
 
 		let clickedCell = this.cells.find(c => c.spr.isoBounds.containsXY(tapCoords.x, tapCoords.y));
-		if(!clickedCell)
+		if(!clickedCell || clickedCell.isObstacle)
 			return;
 
 		let unitAtClickedCell = this._getUnitAt(clickedCell);
