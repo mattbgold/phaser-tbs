@@ -78,7 +78,7 @@ export class UnitController extends BaseController {
 	};
 
 	private _onUnitMove = (cell: GridCell): void => {
-		this._moveUnit2(this._selectedUnit, cell);
+		this._moveUnit(this._selectedUnit, cell);
 	};
 	
 	private _onUnitAttack = (defendingUnit: BaseUnit): void => {
@@ -93,72 +93,56 @@ export class UnitController extends BaseController {
 	// ---------------------------------------
 
 	private _moveUnit(unit: BaseUnit, targetCell: GridCell): void {
-		let x = targetCell.x, y = targetCell.y;
-		let skipXAnimation = x === unit.x;
-
-		let movementX = this._ctrl.game.add.tween(unit.spr)
-			.to({ isoX: x * this._ctrl.config.cellSize }, Math.abs(unit.x - x)*150, Phaser.Easing.Linear.None);
-
-		movementX.onComplete.add(() => unit.setYPosition(y));
-
-		var movementY = this._ctrl.game.add.tween(unit.spr)
-			.to({ isoY: y * this._ctrl.config.cellSize }, Math.abs(unit.y - y)*150, Phaser.Easing.Linear.None);
-
-		movementY.onComplete.add(() => this._ctrl.dispatch(GameEvent.UnitMoveCompleted, unit));
-
-		unit.setXPosition(x);
-
-		if(skipXAnimation) {
-			unit.setYPosition(y)
-			movementY.start();
-		} else {
-			movementX.chain(movementY).start();
-		}
-	}
-
-	private _moveUnit2(unit: BaseUnit, targetCell: GridCell): void {
 		let path = targetCell.pathFromActiveCell;
 
-		let tweens: Tween = [];
+		let tween = this._ctrl.game.add.tween(unit.spr);
 		let xx = unit.x;
-		let yy = unit.y
+		let yy = unit.y;
+
+		let xPos = [unit.x];
+		let yPos = [unit.y];
 
 		for(let i in path) {
 			let currentTween;
 
 			switch(path[i]) {
 				case 'up':
-					currentTween = this._ctrl.game.add.tween(unit.spr)
-						.to({ isoY: (--yy) * this._ctrl.config.cellSize }, 150, Phaser.Easing.Linear.None);
-					currentTween.onStart.add(() => unit.setYPosition(unit.y - 1));
+					yPos.push(--yy);
+					xPos.push(xx);
+					tween.to({ isoY: (yy) * this._ctrl.config.cellSize }, 150, Phaser.Easing.Linear.None);
 					break;
 				case 'down':
-					currentTween = this._ctrl.game.add.tween(unit.spr)
-						.to({ isoY: (++yy) * this._ctrl.config.cellSize }, 150, Phaser.Easing.Linear.None);
-					currentTween.onStart.add(() => unit.setYPosition(unit.y + 1));
+					yPos.push(++yy);
+					xPos.push(xx);
+					tween.to({ isoY: (yy) * this._ctrl.config.cellSize }, 150, Phaser.Easing.Linear.None);
 					break;
 				case 'left':
-					currentTween = this._ctrl.game.add.tween(unit.spr)
-						.to({ isoX: (--xx) * this._ctrl.config.cellSize }, 150, Phaser.Easing.Linear.None);
-					currentTween.onStart.add(() => unit.setXPosition(unit.x - 1));
+					xPos.push(--xx);
+					yPos.push(yy);
+					tween.to({ isoX: (xx) * this._ctrl.config.cellSize }, 150, Phaser.Easing.Linear.None);
 					break;
 				case 'right':
-					currentTween = this._ctrl.game.add.tween(unit.spr)
-						.to({ isoX: (++xx) * this._ctrl.config.cellSize }, 150, Phaser.Easing.Linear.None);
-					currentTween.onStart.add(() => unit.setXPosition(unit.x + 1));
+					xPos.push(++xx);
+					yPos.push(yy);
+					tween.to({ isoX: (xx) * this._ctrl.config.cellSize }, 150, Phaser.Easing.Linear.None);
 					break;
 				default:
 					console.error('Invalid path');
 			}
-			if(tweens.length) {
-				tweens[tweens.length-1].chain(currentTween);
-			}
-
-			tweens.push(currentTween);
 		}
 
-		tweens[tweens.length - 1].onComplete.add(() => this._ctrl.dispatch(GameEvent.UnitMoveCompleted, unit));
-		tweens[0].start();
+		let posIndex = 1;
+		tween.onChildComplete.add((a,b) => {
+			if(posIndex >= xPos.length) return;
+			posIndex++;
+			console.log('x', a.x, xPos[posIndex]);
+			unit.setXPosition(xPos[posIndex]);
+			unit.setYPosition(yPos[posIndex]);
+		});
+		unit.setXPosition(xPos[1]);
+		unit.setYPosition(yPos[1]);
+		tween.onComplete.add(() => this._ctrl.dispatch(GameEvent.UnitMoveCompleted, unit));
+		tween.start();
 	}
 
 	private _handleCombat(attackingUnit: BaseUnit, defendingUnit: BaseUnit): void {

@@ -39,7 +39,9 @@ export class GridController extends BaseController {
 				// The last parameter is the group you want to add it to (just like game.add.sprite)
 				let tileSpr = this._ctrl.game.add.isoSprite(xx*this._ctrl.config.cellSize, yy*this._ctrl.config.cellSize, 0, 'tile', 0, this.isoGridGroup);
 				tileSpr.anchor.set(0.5, 0);
-				this.cells.push(new GridCell(tileSpr, xx, yy));
+				let newCell = new GridCell(tileSpr, xx, yy);
+				if(Math.random() < .3) {newCell.spr.tint = 0x555555; newCell.isObstacle = true;}
+				this.cells.push(newCell);
 			}
 		}
 	}
@@ -174,8 +176,9 @@ export class GridController extends BaseController {
 		});
 	}
 	
-	private _highlightCellsInRange(cell: GridCell, range: number, isAttack: boolean = false, previousCell: GridCell = null, depth: number = 0, originalCell = null) {
-		if (!range || !cell || cell.isObstacle)
+	private _highlightCellsInRange(cell: GridCell, range: number, isAttack: boolean = false, previousCell: GridCell = null) {
+		if (!range || !cell || cell.isObstacle
+			|| (cell.active && !!previousCell)) //if we looped back to the original cell, just stop
 			return;
 
 		if(isAttack || !this._getUnitAt(cell)) {
@@ -190,27 +193,25 @@ export class GridController extends BaseController {
 
 		if(!previousCell) {
 			this.cells.forEach(c => c.pathFromActiveCell = []);
-			originalCell = cell;
 		}
 		else {
-			let distanceTravelled = Math.abs(cell.x - originalCell.x) + Math.abs(cell.y - originalCell.y);
-			if (distanceTravelled-1 === previousCell.pathFromActiveCell.length && previousCell.pathFromActiveCell.length === depth - 1){
-				direction = cell.x === previousCell.x
-					? cell.y - previousCell.y > 0 ? 'down' : 'up'
-					: cell.x - previousCell.x > 0 ? 'right' : 'left';
+			direction = cell.x === previousCell.x
+				? cell.y - previousCell.y > 0 ? 'down' : 'up'
+				: cell.x - previousCell.x > 0 ? 'right' : 'left';
 
+			if (cell.pathFromActiveCell.length === 0 || previousCell.pathFromActiveCell.length <= cell.pathFromActiveCell.length){
 				cell.pathFromActiveCell = previousCell.pathFromActiveCell.concat([direction]);
 			}
 		}
 
 		if (direction !== 'left')
-			this._highlightCellsInRange(this.cells.find(c => c.x === cell.x + 1 && c.y === cell.y), range - 1, isAttack, cell, depth + 1, originalCell);
+			this._highlightCellsInRange(this.cells.find(c => c.x === cell.x + 1 && c.y === cell.y), range - 1, isAttack, cell);
 		if (direction !== 'right')
-			this._highlightCellsInRange(this.cells.find(c => c.x === cell.x - 1 && c.y === cell.y), range - 1, isAttack, cell, depth + 1, originalCell);
+			this._highlightCellsInRange(this.cells.find(c => c.x === cell.x - 1 && c.y === cell.y), range - 1, isAttack, cell);
 		if (direction !== 'up')
-			this._highlightCellsInRange(this.cells.find(c => c.x === cell.x && c.y === cell.y + 1), range - 1, isAttack, cell, depth + 1, originalCell);
+			this._highlightCellsInRange(this.cells.find(c => c.x === cell.x && c.y === cell.y + 1), range - 1, isAttack, cell);
 		if (direction !== 'down')
-			this._highlightCellsInRange(this.cells.find(c => c.x === cell.x && c.y === cell.y - 1), range - 1, isAttack, cell, depth + 1, originalCell);
+			this._highlightCellsInRange(this.cells.find(c => c.x === cell.x && c.y === cell.y - 1), range - 1, isAttack, cell);
 	}
 
 	private _getUnitAt(cell: GridCell): BaseUnit {
