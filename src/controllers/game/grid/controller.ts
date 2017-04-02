@@ -110,6 +110,7 @@ export class GridController extends BaseController {
 
 			// if we tapped a destination cell for MOVE action
 			if (!!this._highlightCellsForMove && clickedCell.highlighted) {
+				console.log(clickedCell.pathFromActiveCell);
 				this._unhighlightAll()
 				this._ctrl.dispatch(GameEvent.UnitMove, clickedCell);
 			}
@@ -172,9 +173,8 @@ export class GridController extends BaseController {
 				cell.spr.tint = 0xffffff;
 		});
 	}
-
-	//TODO: use this fn for attack range, just change tint color
-	private _highlightCellsInRange(cell: GridCell, range: number, isAttack: boolean = false) {
+	
+	private _highlightCellsInRange(cell: GridCell, range: number, isAttack: boolean = false, previousCell: GridCell = null, depth: number = 0, originalCell = null) {
 		if (!range || !cell || cell.isObstacle)
 			return;
 
@@ -186,10 +186,31 @@ export class GridController extends BaseController {
 				cell.spr.tint = isAttack ? highlightAttackColor : highlightMoveColor;
 		}
 
-		this._highlightCellsInRange(this.cells.find(c => c.x === cell.x + 1 && c.y === cell.y), range - 1, isAttack);
-		this._highlightCellsInRange(this.cells.find(c => c.x === cell.x - 1 && c.y === cell.y), range - 1, isAttack);
-		this._highlightCellsInRange(this.cells.find(c => c.x === cell.x && c.y === cell.y + 1), range - 1, isAttack);
-		this._highlightCellsInRange(this.cells.find(c => c.x === cell.x && c.y === cell.y - 1), range - 1, isAttack);
+		let direction = '';
+
+		if(!previousCell) {
+			this.cells.forEach(c => c.pathFromActiveCell = []);
+			originalCell = cell;
+		}
+		else {
+			let distanceTravelled = Math.abs(cell.x - originalCell.x) + Math.abs(cell.y - originalCell.y);
+			if (distanceTravelled-1 === previousCell.pathFromActiveCell.length && previousCell.pathFromActiveCell.length === depth - 1){
+				direction = cell.x === previousCell.x
+					? cell.y - previousCell.y > 0 ? 'down' : 'up'
+					: cell.x - previousCell.x > 0 ? 'right' : 'left';
+
+				cell.pathFromActiveCell = previousCell.pathFromActiveCell.concat([direction]);
+			}
+		}
+
+		if (direction !== 'left')
+			this._highlightCellsInRange(this.cells.find(c => c.x === cell.x + 1 && c.y === cell.y), range - 1, isAttack, cell, depth + 1, originalCell);
+		if (direction !== 'right')
+			this._highlightCellsInRange(this.cells.find(c => c.x === cell.x - 1 && c.y === cell.y), range - 1, isAttack, cell, depth + 1, originalCell);
+		if (direction !== 'up')
+			this._highlightCellsInRange(this.cells.find(c => c.x === cell.x && c.y === cell.y + 1), range - 1, isAttack, cell, depth + 1, originalCell);
+		if (direction !== 'down')
+			this._highlightCellsInRange(this.cells.find(c => c.x === cell.x && c.y === cell.y - 1), range - 1, isAttack, cell, depth + 1, originalCell);
 	}
 
 	private _getUnitAt(cell: GridCell): BaseUnit {

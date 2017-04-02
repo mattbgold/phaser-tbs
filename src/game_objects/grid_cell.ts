@@ -8,8 +8,9 @@ export class GridCell {
 	hover: boolean;
 	active: boolean;
 	highlighted: boolean;
-	
 	isObstacle: boolean;
+
+	pathFromActiveCell: string[] = [];
 	
 	constructor(spr: IsoSprite, x: number, y: number) {
 		this.x = x;

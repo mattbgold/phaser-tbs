@@ -77,7 +77,7 @@ export class UnitController extends BaseController {
 	};
 
 	private _onUnitMove = (cell: GridCell): void => {
-		this._moveUnit(this._selectedUnit, cell.x, cell.y);
+		this._moveUnit(this._selectedUnit, cell);
 	};
 	
 	private _onUnitAttack = (defendingUnit: BaseUnit): void => {
@@ -91,10 +91,11 @@ export class UnitController extends BaseController {
 	// ---------- HELPER FUNCTIONS  ----------
 	// ---------------------------------------
 
-	private _moveUnit(unit: BaseUnit, x, y): void {
+	private _moveUnit(unit: BaseUnit, targetCell: GridCell): void {
+		let x = targetCell.x, y = targetCell.y;
 		let skipXAnimation = x === unit.x;
 
-		var movementX = this._ctrl.game.add.tween(unit.spr)
+		let movementX = this._ctrl.game.add.tween(unit.spr)
 			.to({ isoX: x * this._ctrl.config.cellSize }, Math.abs(unit.x - x)*150, Phaser.Easing.Linear.None);
 
 		movementX.onComplete.add(() => unit.setYPosition(y));
