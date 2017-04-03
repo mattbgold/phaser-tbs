@@ -44,15 +44,14 @@ class TbsGame {
 
     //game settings
     this.game.iso.anchor.setTo(0.5, 0.2);
+    this.game['isoGridGroup'] = this.game.add.group();
+    this.game['isoUnitsGroup'] = this.game.add.group();
   }
 
   create() {
-
-    this.game.stage.backgroundColor = '#ddeaff';
+    this.game.stage.backgroundColor = '#aaccff';
 
     this.controllers.forEach(_ => _.init());
-
-    this._spawnUnits();
   }
 
   render() {
@@ -61,12 +60,6 @@ class TbsGame {
 
   update() {
     this.controllers.forEach(_ => _.update());
-  }
-
-  //TODO: delete me at some point
-  private _spawnUnits(): void {
-    var unitController = <UnitController>(this.controllers.find(c => c instanceof UnitController));
-    unitController.loadUnits(this.config.army.map(x => this.config.units[x]));
   }
 }
 

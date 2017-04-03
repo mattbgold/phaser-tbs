@@ -1,11 +1,16 @@
 import * as Phaser from 'phaser';
-import {injectable} from "inversify";
+import {injectable, inject} from "inversify";
 import {GameController, GameEvent} from "../controller";
-import {GridCell} from "../../../game_objects/grid_cell";
 import {InputController, InputEvent} from "../../input/controller";
 import {BaseController} from "../../base";
 import Group = Phaser.Group;
 import {BaseUnit} from "../../../game_objects/units/base";
+import {GameConfig} from "../../../config";
+import Game = Phaser.Game;
+import {GridCell} from "../../../game_objects/grid/grid_cell";
+import {WaterCell} from "../../../game_objects/grid/water";
+import {BridgeCell} from "../../../game_objects/grid/bridge";
+import {MountainCell} from "../../../game_objects/grid/mountain";
 
 @injectable()
 export class GridController extends BaseController {
@@ -17,7 +22,12 @@ export class GridController extends BaseController {
 	private _highlightCellsForAttack: BaseUnit;
 	private _canActivateCells: boolean = true;
 
-	constructor(private _ctrl: GameController, private _input: InputController) {
+	constructor(
+		private _game: Game,
+		private _ctrl: GameController, 
+		private _input: InputController,
+		@inject('config') private _config: GameConfig
+	) {
 		super();
 		this.cells = [];
 		_ctrl.set('cells', this.cells);
@@ -31,16 +41,30 @@ export class GridController extends BaseController {
 		this._ctrl.subscribe(GameEvent.UnitMove, () => this._canActivateCells = false);
 		this._ctrl.subscribe(GameEvent.UnitMoveCompleted, () => this._canActivateCells = true);
 
-		this.isoGridGroup = this._ctrl.game.add.group();
+		this.isoGridGroup = this._game['isoGridGroup'];
 
-		for (let xx = 0; xx < this._ctrl.config.gridSizeX; xx++) {
-			for (let yy = 0; yy < this._ctrl.config.gridSizeY; yy++) {
+		for (let xx = 0; xx < this._config.map[0].length; xx++) {
+			for (let yy = 0; yy < this._config.map.length; yy++) {
 				// Create a tile using the new game.add.isoSprite factory method at the specified position.
 				// The last parameter is the group you want to add it to (just like game.add.sprite)
-				let tileSpr = this._ctrl.game.add.isoSprite(xx*this._ctrl.config.cellSize, yy*this._ctrl.config.cellSize, 0, 'tile', 0, this.isoGridGroup);
+				let tileSpr = this._game.add.isoSprite(xx * this._config.cellSize, yy * this._config.cellSize, 0, 'tile', 0, this.isoGridGroup);
 				tileSpr.anchor.set(0.5, 0);
-				let newCell = new GridCell(tileSpr, xx, yy);
-				if(Math.random() < .2) {newCell.spr.tint = 0x555555; newCell.isObstacle = true;}
+				
+				let newCell: GridCell; 
+
+				//TODO: move to map builder or use a type map
+				if (this._config.map[yy][xx] === 'W') {
+					newCell = new WaterCell(tileSpr, xx, yy);
+					let waterAnimation = this._game.add.tween(newCell.spr).to({isoZ: -5}, 800, Phaser.Easing.Sinusoidal.InOut, false, 0, 0, true).loop(true);
+					setTimeout(() => waterAnimation.start(), Math.random() * 1000);
+				} else if (this._config.map[yy][xx] === 'M') {
+					newCell = new MountainCell(tileSpr, xx, yy);
+				} else if (this._config.map[yy][xx] === 'B') {
+					newCell = new BridgeCell(tileSpr, xx, yy);
+				} else {
+					newCell = new GridCell(tileSpr, xx, yy);
+				}
+
 				this.cells.push(newCell);
 			}
 		}
@@ -48,7 +72,7 @@ export class GridController extends BaseController {
 	
 	update() {
 		this.cells.forEach(cell =>  {
-			if (cell.isObstacle)
+			if (cell.blocksAttack || cell.blocksMove)
 				return;
 			let inBounds = cell.spr.isoBounds.containsXY(this._input.cursorPos.x, this._input.cursorPos.y);
 
@@ -59,30 +83,30 @@ export class GridController extends BaseController {
 					if(!cell.highlighted && !cell.active) {
 						cell.spr.tint = highlightHoverColor;
 					}
-					this._ctrl.game.add.tween(cell.spr).to({isoZ: 4}, 200, Phaser.Easing.Quadratic.InOut, true);
+					this._game.add.tween(cell.spr).to({isoZ: 4}, 200, Phaser.Easing.Quadratic.InOut, true);
 					let unitToRaise = this._getUnitAt(cell);
 					if (!!unitToRaise)
-						this._ctrl.game.add.tween(unitToRaise.spr).to({isoZ: 4}, 200, Phaser.Easing.Quadratic.InOut, true);
+						this._game.add.tween(unitToRaise.spr).to({isoZ: 4}, 200, Phaser.Easing.Quadratic.InOut, true);
 				}
 			}
 			// If not, revert back to how it was.
 			else if ((cell.hover) && !inBounds) {
 				cell.hover = false;
 				if(!cell.highlighted && !cell.active) {
-					cell.spr.tint = 0xffffff;
+					cell.spr.tint = cell.restingTint;
 				}
 				if(!cell.active) { // do not lower the cell if its active
-					this._ctrl.game.add.tween(cell.spr).to({isoZ: 0}, 200, Phaser.Easing.Quadratic.InOut, true);
+					this._game.add.tween(cell.spr).to({isoZ: cell.restingZ}, 200, Phaser.Easing.Quadratic.InOut, true);
 					let unitToLower = this._getUnitAt(cell);
 					if (!!unitToLower)
-						this._ctrl.game.add.tween(unitToLower.spr).to({isoZ: 0}, 200, Phaser.Easing.Quadratic.InOut, true);
+						this._game.add.tween(unitToLower.spr).to({isoZ: 0}, 200, Phaser.Easing.Quadratic.InOut, true);
 				}
 			}
 			else if (!cell.hover && !cell.active && cell.spr.isoZ === 4) { // clean up active cells after deactivation
-				this._ctrl.game.add.tween(cell.spr).to({isoZ: 0}, 200, Phaser.Easing.Quadratic.InOut, true);
+				this._game.add.tween(cell.spr).to({isoZ: cell.restingZ}, 200, Phaser.Easing.Quadratic.InOut, true);
 				let unitToLower = this._getUnitAt(cell);
 				if (!!unitToLower)
-					this._ctrl.game.add.tween(unitToLower.spr).to({isoZ: 0}, 200, Phaser.Easing.Quadratic.InOut, true);
+					this._game.add.tween(unitToLower.spr).to({isoZ: 0}, 200, Phaser.Easing.Quadratic.InOut, true);
 			}
 		});
 	}
@@ -98,7 +122,7 @@ export class GridController extends BaseController {
 			return;
 
 		let clickedCell = this.cells.find(c => c.spr.isoBounds.containsXY(tapCoords.x, tapCoords.y));
-		if(!clickedCell || clickedCell.isObstacle)
+		if(!clickedCell || clickedCell.blocksAttack || clickedCell.blocksMove)
 			return;
 
 		let unitAtClickedCell = this._getUnitAt(clickedCell);
@@ -108,14 +132,13 @@ export class GridController extends BaseController {
 			// reset the active cell
 			if(!!this._activeCell) {
 				this._activeCell.active = false;
-				this._activeCell.spr.tint = 0xffffff;
+				this._activeCell.spr.tint = this._activeCell.restingTint;
 				this._activeCell = null;
 			}
 
 			// if we tapped a destination cell for MOVE action
 			if (!!this._highlightCellsForMove && clickedCell.highlighted) {
-				console.log(clickedCell.pathFromActiveCell);
-				this._unhighlightAll()
+				this._unhighlightAll();
 				this._ctrl.dispatch(GameEvent.UnitMove, clickedCell);
 			}
 			// else if we tapped a target cell for ATTACK action
@@ -135,11 +158,11 @@ export class GridController extends BaseController {
 				this._ctrl.dispatch(GameEvent.GridCellActivated, clickedCell);
 			}
 		}
-	}
+	};
 
 	private _onCancelAction = () => {
 		this._unhighlightAll();
-	}
+	};
 
 	private _onMoveActionSelected = (unit: BaseUnit) => {
 		//highlight all cells in move range
@@ -174,16 +197,16 @@ export class GridController extends BaseController {
 		this.cells.filter(cell => cell.highlighted).forEach(cell => {
 			cell.highlighted = false;
 			if(!cell.active)
-				cell.spr.tint = 0xffffff;
+				cell.spr.tint = cell.restingTint;
 		});
 	}
 	
 	private _highlightCellsInRange(cell: GridCell, range: number, isAttack: boolean = false, previousCell: GridCell = null, previousDirection: string = null) {
-		if (!range || !cell || cell.isObstacle
+		if (!range || !cell || (cell.blocksMove && !isAttack) || (cell.blocksAttack && isAttack)
 			|| (cell.active && !!previousCell)) //if we looped back to the original cell, just stop
 			return;
 
-		if(isAttack || !this._getUnitAt(cell)) {
+		if((isAttack || !this._getUnitAt(cell)) && !cell.blocksMove) {
 			// if the cell is not occupied, highlight it
 			cell.highlighted = true;
 

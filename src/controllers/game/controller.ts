@@ -7,28 +7,25 @@ import {BaseController} from "../base";
 
 @injectable()
 export class GameController extends BaseController {
-	game: Game;
-	config: GameConfig;
-
 	private _cache: {[key:string]: any} = {};
-	
-	constructor(game:Game, @inject('config')config: GameConfig) {
+
+	constructor(private _game: Game, @inject('config')private _config: GameConfig) {
 		super();
-		
-		this.config = config;
-		this.game = game;
-		
-		for(let i in [0,1,2,3,4, 5, 6, 7, 8]) {
-			this.subscribe(parseInt(i), _ => console.log(GameEvent[parseInt(i)], _));
-		}
 	}
 
-	init() {}
+	init() {
+		 // for(let i in [0,1,2,3,4, 5, 6, 7, 8]) {
+		 // 	this.subscribe(parseInt(i), _ => console.log(GameEvent[parseInt(i)], _));
+		 // }
+		this._game.iso.simpleSort(this._game['isoGridGroup']);
+	}
 
-	update() {}
+	update() {
+		this._game.iso.simpleSort(this._game['isoUnitsGroup']);
+	}
 	
 	render() {
-		this.game.debug.text(this.game.time.fps || '--', 2, 14, "#a7aebe");
+		this._game.debug.text(this._game.time.fps || '--', 2, 14, "#a7aebe");
 	}
 	
 	set(key: string, obj: any):void {

@@ -1,15 +1,23 @@
-import {injectable} from "inversify";
+import {injectable, inject} from "inversify";
+import * as Phaser from 'phaser';
 import {GameController, GameEvent} from "../controller";
 import {InputController, InputEvent} from "../../input/controller";
 import {BaseController} from "../../base";
 import {BaseUnit} from "../../../game_objects/units/base";
+import {GameConfig} from "../../../config";
+import Game = Phaser.Game;
 
 @injectable()
 export class ContextMenuController extends BaseController {
 
 	private _selectedUnit: BaseUnit;
 
-	constructor(private _ctrl: GameController, private _input: InputController) {
+	constructor(
+		private _game: Game,
+		private _ctrl: GameController,
+		private _input: InputController,
+		@inject('config') private _config: GameConfig
+	) {
 		super();
 	}
 

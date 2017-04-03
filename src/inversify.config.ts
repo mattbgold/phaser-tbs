@@ -9,6 +9,7 @@ import {InputController} from "./controllers/input/controller";
 import {BaseController} from "./controllers/base";
 import {GameConfig, getConfig} from "./config";
 import Factory = interfaces.Factory;
+import {ArmyBuilder} from "./services/army_builder";
 
 let container = new Container();
 
@@ -19,6 +20,8 @@ container.bind<GridController>(GridController).toSelf().inSingletonScope();
 container.bind<ContextMenuController>(ContextMenuController).toSelf().inSingletonScope();
 container.bind<GameController>(GameController).toSelf().inSingletonScope();
 container.bind<InputController>(InputController).toSelf().inSingletonScope();
+
+container.bind<ArmyBuilder>(ArmyBuilder).toSelf().inSingletonScope();
 
 container.bind<Factory<BaseController[]>>('controllers').toFactory<BaseController[]>((context: interfaces.Context) => {
 	return () => [

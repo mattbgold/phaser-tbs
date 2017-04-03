@@ -1,19 +1,43 @@
 import {Unit} from "./models/unit";
 
 export interface GameConfig {
-	gridSizeX: number;
-	gridSizeY: number;
 	cellSize: number;
 	units: {[key:string]: Unit};
-	army: string[];
+	army1: string[];
+	army2: string[];
+	map: string[][];
 };
 
 export function getConfig(): GameConfig {
 	return {
-		gridSizeX: 10,
-		gridSizeY: 8,
 		cellSize: 38,
-		army: ['scout', 'scout', 'assault', 'tank'],
+		army2: ['scout', 'tank', 'tank', 'scout'],
+		army1: ['scout', 'scout', 'scout', 'assault', 'assault', 'assault', 'assault'],
+		map: [
+			['W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W'],
+			
+			['W', ' ', ' ', ' ', '2', '2', '2', '2', ' ', ' ', ' ', 'W'],
+			
+			['W', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'W'],
+			
+			['W', 'B', 'W', 'W', ' ', ' ', 'M', ' ', ' ', ' ', ' ', 'W'],
+			
+			['W', ' ', ' ', 'W', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'W'],
+			
+			['W', ' ', ' ', 'W', 'W', 'B', 'B', 'W', 'W', ' ', ' ', 'W'],
+			
+			['W', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'W', ' ', ' ', 'W'],
+			
+			['W', ' ', ' ', 'M', 'M', ' ', ' ', ' ', 'W', 'B', 'W', 'W'],
+			
+			['W', ' ', ' ', 'M', 'M', ' ', ' ', ' ', ' ', ' ', ' ', 'W'],
+			
+			['W', ' ', ' ', ' ', ' ', '1', '1', '1', ' ', ' ', ' ', 'W'],
+			
+			['W', ' ', ' ', ' ', '1', '1', '1', '1', ' ', ' ', ' ', 'W'],
+			
+			['W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W'],
+		],
 		units: {
 			'scout': {
 				name: 'scout',

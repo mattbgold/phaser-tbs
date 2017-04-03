@@ -1,33 +1,29 @@
 import * as Phaser from 'phaser';
-import {injectable} from "inversify";
+import {injectable, inject} from "inversify";
 import Game = Phaser.Game;
-import {Unit} from "../../../models/unit";
 import {BaseUnit} from "../../../game_objects/units/base";
 import {GameController, GameEvent} from "../controller";
 import {InputController} from "../../input/controller";
-import {ScoutUnit} from "../../../game_objects/units/scout";
-import {GridCell} from "../../../game_objects/grid_cell";
+import {GridCell} from "../../../game_objects/grid/grid_cell";
 import {BaseController} from "../../base";
-import {TankUnit} from "../../../game_objects/units/tank";
-import {AssaultUnit} from "../../../game_objects/units/assault";
 import Tween = Phaser.Tween;
+import {GameConfig} from "../../../config";
+import {ArmyBuilder} from "../../../services/army_builder";
 
 
 @injectable()
 export class UnitController extends BaseController {
-	private unitTypeMap: {[key:string]: any} = {
-	'scout': ScoutUnit,
-	'assault': AssaultUnit,
-	'tank': TankUnit
-	};
-
 	private _selectedUnit: BaseUnit;
 	private _deadUnits: BaseUnit[] = [];
 
-	constructor(private _ctrl: GameController, private _input: InputController) {
+	constructor(
+		private _game: Game, 
+		private _ctrl: GameController, 
+		private _input: InputController, 
+		@inject('config') private _config: GameConfig,
+	    private _armyBuilder: ArmyBuilder
+	) {
 		super();
-		this.units = [];
-		_ctrl.set('units', this.units);
 	}
 
 	units: BaseUnit[];
@@ -37,25 +33,19 @@ export class UnitController extends BaseController {
 		this._ctrl.subscribe(GameEvent.CancelAction, this._onCancelAction);
 		this._ctrl.subscribe(GameEvent.UnitMove, this._onUnitMove);
 		this._ctrl.subscribe(GameEvent.UnitAttack, this._onUnitAttack);
+		
+		this.units = this._armyBuilder.build(1);
+		this.units = this.units.concat(this._armyBuilder.build(2));
+		this._ctrl.set('units', this.units);
 	}
 
 	update() { }
 
 	render() {
 		if(!!this._selectedUnit) {
-			this._ctrl.game.debug.text(`${this._selectedUnit.name} HP: ${this._selectedUnit.hp}`, 2, 34, "#a7aebe");
-			this._ctrl.game.debug.text('Base Unit Stats:' + JSON.stringify(this._selectedUnit.stats), 2, 54, "#a7aebe");
+			this._game.debug.text(`${this._selectedUnit.name} HP: ${this._selectedUnit.hp}`, 2, 34, "#a7aebe");
+			this._game.debug.text('Base Unit Stats:' + JSON.stringify(this._selectedUnit.stats), 2, 54, "#a7aebe");
 		}
-	}
-	
-	loadUnits(units: Unit[]) {
-		let xx = 0;
-
-		units.forEach(unit => {
-			unit.x = xx++;
-			unit.y = 0;
-			this._createUnit(unit)
-		});
 	}
 
 	// ------------------------------------
@@ -95,7 +85,7 @@ export class UnitController extends BaseController {
 	private _moveUnit(unit: BaseUnit, targetCell: GridCell): void {
 		let path = targetCell.pathFromActiveCell;
 
-		let tween = this._ctrl.game.add.tween(unit.spr);
+		let tween = this._game.add.tween(unit.spr);
 		let xx = unit.x;
 		let yy = unit.y;
 
@@ -103,28 +93,26 @@ export class UnitController extends BaseController {
 		let yPos = [unit.y];
 
 		for(let i in path) {
-			let currentTween;
-
 			switch(path[i]) {
 				case 'up':
 					yPos.push(--yy);
 					xPos.push(xx);
-					tween.to({ isoY: (yy) * this._ctrl.config.cellSize }, 150, Phaser.Easing.Linear.None);
+					tween.to({ isoY: (yy) * this._config.cellSize }, 150, Phaser.Easing.Linear.None);
 					break;
 				case 'down':
 					yPos.push(++yy);
 					xPos.push(xx);
-					tween.to({ isoY: (yy) * this._ctrl.config.cellSize }, 150, Phaser.Easing.Linear.None);
+					tween.to({ isoY: (yy) * this._config.cellSize }, 150, Phaser.Easing.Linear.None);
 					break;
 				case 'left':
 					xPos.push(--xx);
 					yPos.push(yy);
-					tween.to({ isoX: (xx) * this._ctrl.config.cellSize }, 150, Phaser.Easing.Linear.None);
+					tween.to({ isoX: (xx) * this._config.cellSize }, 150, Phaser.Easing.Linear.None);
 					break;
 				case 'right':
 					xPos.push(++xx);
 					yPos.push(yy);
-					tween.to({ isoX: (xx) * this._ctrl.config.cellSize }, 150, Phaser.Easing.Linear.None);
+					tween.to({ isoX: (xx) * this._config.cellSize }, 150, Phaser.Easing.Linear.None);
 					break;
 				default:
 					console.error('Invalid path');
@@ -135,7 +123,6 @@ export class UnitController extends BaseController {
 		tween.onChildComplete.add((a,b) => {
 			if(posIndex >= xPos.length) return;
 			posIndex++;
-			console.log('x', a.x, xPos[posIndex]);
 			unit.setXPosition(xPos[posIndex]);
 			unit.setYPosition(yPos[posIndex]);
 		});
@@ -152,9 +139,9 @@ export class UnitController extends BaseController {
 		attackingUnit.pointToUnit(defendingUnit);
 		defendingUnit.pointToUnit(attackingUnit);
 
-		let attackerAnimation = this._ctrl.game.add.tween(attackingUnit.spr).to({isoX:attackingUnit.spr.isoX + 2}, 50, Phaser.Easing.Elastic.InOut, true, 0, 4, true);
+		let attackerAnimation = this._game.add.tween(attackingUnit.spr).to({isoX:attackingUnit.spr.isoX + 2}, 50, Phaser.Easing.Elastic.InOut, true, 0, 4, true);
 		if (damage) {
-			this._ctrl.game.time.events.repeat(50, 10, () => defendingUnit.spr.tint = defendingUnit.spr.tint === 0xff0000 ? 0xffffff : 0xff0000);
+			this._game.time.events.repeat(50, 10, () => defendingUnit.spr.tint = defendingUnit.spr.tint === 0xff0000 ? 0xffffff : 0xff0000);
 		}
 
 		attackerAnimation.onComplete.add(() => {
@@ -166,7 +153,7 @@ export class UnitController extends BaseController {
 				this._deadUnits.push(this.units.splice(this.units.indexOf(defendingUnit), 1)[0]);
 
 				//TODO: remove this later
-				let explosion = this._ctrl.game.add.sprite(defendingUnit.spr.x, defendingUnit.spr.y, 'explosion');
+				let explosion = this._game.add.sprite(defendingUnit.spr.x, defendingUnit.spr.y, 'explosion');
 				explosion.anchor.set(.5, .5);
 				explosion.scale.set(.5, .5);
 				explosion.animations.add('explode');
@@ -175,14 +162,15 @@ export class UnitController extends BaseController {
 			}
 		});
 	}
-	
-	private _createUnit(unit: Unit): BaseUnit {
-		let spr = this._ctrl.game.add.isoSprite(unit.x*this._ctrl.config.cellSize, unit.y*this._ctrl.config.cellSize, 0, unit.asset, 0);
-		let unitObj = new (this.unitTypeMap[unit.name])(unit, spr);
 
-		this.units.push(unitObj);
-		return unitObj;
-	}
+	//TODO: delete me at some point
+	// private _createUnit(unit: Unit): BaseUnit {
+	// 	let spr = this._game.add.isoSprite(unit.x*this._config.cellSize, unit.y*this._config.cellSize, 0, unit.asset, 0);
+	// 	let unitObj = new (this.unitTypeMap[unit.name])(unit, spr);
+	//
+	// 	this.units.push(unitObj);
+	// 	return unitObj;
+	// }
 	//TODO: we need some kind of TurnExecutor to run the turn in sequence.
 	// for the team in action phase, execute the moves and actions one at a time
 }
