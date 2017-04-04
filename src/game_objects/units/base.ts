@@ -11,6 +11,8 @@ export abstract class BaseUnit implements Unit {
 	name: string;
 	asset: string;
 
+	belongsToPlayer: number;
+
 	x: number;
 	y: number;
 
@@ -30,6 +32,7 @@ export abstract class BaseUnit implements Unit {
 	init(unit: Unit) {
 		this.name = unit.name;
 		this.asset = unit.asset;
+		this.belongsToPlayer = unit.belongsToPlayer;
 		this.x = unit.x;
 		this.y = unit.y;
 		this.stats = unit.stats;

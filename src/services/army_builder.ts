@@ -10,32 +10,37 @@ import {BaseUnit} from "../game_objects/units/base";
 
 @injectable()
 export class ArmyBuilder {
-	private _army1Units: Unit[] = [];
-	private _army2Units: Unit[] = [];
+	private _unitsByPlayer = [];
 
 	//this class is used to build armies in the army selection phase, then used to get the list of units to put into the grid.
 	// also used to place units in that begin phase
 	constructor(
 		private _game: Game,
 		@inject('config') private _config: GameConfig) {
-		this._loadFromConfig();
+		this._loadFromConfig('demo'); //TODO: call this elsewhere
 	}
 
 	//todo: in the future, the players army will be built in a menu, but CPU army will load from config
-	private _loadFromConfig() {
-		let army1Index = 0, army2Index = 0;
-		this._army1Units = this._config.army1.map(name => JSON.parse(JSON.stringify(this._config.units[name])));
-		this._army2Units = this._config.army2.map(name => JSON.parse(JSON.stringify(this._config.units[name])));
+	private _loadFromConfig(mapName) {
+		let map = this._config.maps.find(m => m.name === mapName);
+		if (!map)
+			return console.error(`Could not find map with name: ${mapName}`);
 
-		for(let yy = 0; yy < this._config.map.length; yy++) {
-			for(let xx = 0; xx < this._config.map.length; xx++) {
-				if(this._config.map[yy][xx] === '1') {
-					this._army1Units[army1Index].x = xx;
-					this._army1Units[army1Index++].y = yy;
-				}
-				else if(this._config.map[yy][xx] === '2') {
-					this._army2Units[army2Index].x = xx;
-					this._army2Units[army2Index++].y = yy;
+		this._unitsByPlayer = map.armies.map((playerArmy, playerNum) => playerArmy.map(unitName => {
+			let model = JSON.parse(JSON.stringify(this._config.units[unitName]));
+			model.belongsToPlayer = playerNum;
+			return model;
+		}));
+
+		let armyIndices = this._unitsByPlayer.map(() => 0);
+
+		for(let yy = 0; yy < map.layout.length; yy++) {
+			for(let xx = 0; xx < map.layout.length; xx++) {
+				let playerNum = parseInt(map.layout[yy][xx]);
+				if(!isNaN(playerNum)) {
+					this._unitsByPlayer[playerNum][armyIndices[playerNum]].x = xx;
+					this._unitsByPlayer[playerNum][armyIndices[playerNum]].y = yy;
+					armyIndices[playerNum]++;
 				}
 			}
 		}
@@ -53,14 +58,14 @@ export class ArmyBuilder {
 	// 	return this._units;
 	// }
 
-	build(armyNum: number): BaseUnit[] {
-		let units: BaseUnit[];
-		if(armyNum === 2) {
-			units = this._army2Units.map(this._mapToGameObject);
-		} else {
-			units = this._army1Units.map(this._mapToGameObject);
-			units.forEach(u => u.spr.scale.x = -1);
-		}
+	build(): BaseUnit[] {
+		let units = this._unitsByPlayer.reduce((a, el) => a.concat(el.map(this._mapToGameObject)), []);
+
+		units.forEach(u => {
+			if(u.belongsToPlayer === 0)
+				u.spr.scale.x = -1
+		});
+
 		return units;
 	}
 

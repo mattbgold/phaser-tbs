@@ -34,8 +34,7 @@ export class UnitController extends BaseController {
 		this._ctrl.subscribe(GameEvent.UnitMove, this._onUnitMove);
 		this._ctrl.subscribe(GameEvent.UnitAttack, this._onUnitAttack);
 		
-		this.units = this._armyBuilder.build(1);
-		this.units = this.units.concat(this._armyBuilder.build(2));
+		this.units = this._armyBuilder.build();
 		this._ctrl.set('units', this.units);
 	}
 

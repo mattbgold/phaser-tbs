@@ -3,41 +3,50 @@ import {Unit} from "./models/unit";
 export interface GameConfig {
 	cellSize: number;
 	units: {[key:string]: Unit};
-	army1: string[];
-	army2: string[];
-	map: string[][];
+	maps: MapLayout[];
 };
+
+export interface MapLayout {
+	name: string;
+	armies: string[][];
+	layout: string[][];
+}
 
 export function getConfig(): GameConfig {
 	return {
 		cellSize: 38,
-		army2: ['scout', 'tank', 'tank', 'scout'],
-		army1: ['scout', 'scout', 'scout', 'assault', 'assault', 'assault', 'assault'],
-		map: [
-			['W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W'],
-			
-			['W', ' ', ' ', ' ', '2', '2', '2', '2', ' ', ' ', ' ', 'W'],
-			
-			['W', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'W'],
-			
-			['W', 'B', 'W', 'W', ' ', ' ', 'M', ' ', ' ', ' ', ' ', 'W'],
-			
-			['W', ' ', ' ', 'W', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'W'],
-			
-			['W', ' ', ' ', 'W', 'W', 'B', 'B', 'W', 'W', ' ', ' ', 'W'],
-			
-			['W', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'W', ' ', ' ', 'W'],
-			
-			['W', ' ', ' ', 'M', 'M', ' ', ' ', ' ', 'W', 'B', 'W', 'W'],
-			
-			['W', ' ', ' ', 'M', 'M', ' ', ' ', ' ', ' ', ' ', ' ', 'W'],
-			
-			['W', ' ', ' ', ' ', ' ', '1', '1', '1', ' ', ' ', ' ', 'W'],
-			
-			['W', ' ', ' ', ' ', '1', '1', '1', '1', ' ', ' ', ' ', 'W'],
-			
-			['W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W'],
-		],
+		maps: [{
+			name: 'demo',
+			armies: [
+				['scout', 'scout', 'scout', 'assault', 'assault', 'assault', 'assault'],
+				['scout', 'tank', 'tank', 'scout']
+			],
+			layout: [
+				['W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W'],
+
+				['W', ' ', ' ', ' ', '1', '1', '1', '1', ' ', ' ', ' ', 'W'],
+
+				['W', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'W'],
+
+				['W', 'B', 'W', 'W', ' ', ' ', 'M', ' ', ' ', ' ', ' ', 'W'],
+
+				['W', ' ', ' ', 'W', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'W'],
+
+				['W', ' ', ' ', 'W', 'W', 'B', 'B', 'W', 'W', ' ', ' ', 'W'],
+
+				['W', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'W', ' ', ' ', 'W'],
+
+				['W', ' ', ' ', 'M', 'M', ' ', ' ', ' ', 'W', 'B', 'W', 'W'],
+
+				['W', ' ', ' ', 'M', 'M', ' ', ' ', ' ', ' ', ' ', ' ', 'W'],
+
+				['W', ' ', ' ', ' ', ' ', '0', '0', '0', ' ', ' ', ' ', 'W'],
+
+				['W', ' ', ' ', ' ', '0', '0', '0', '0', ' ', ' ', ' ', 'W'],
+
+				['W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W'],
+			]
+		}],
 		units: {
 			'scout': {
 				name: 'scout',

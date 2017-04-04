@@ -5,7 +5,7 @@ import {InputController, InputEvent} from "../../input/controller";
 import {BaseController} from "../../base";
 import Group = Phaser.Group;
 import {BaseUnit} from "../../../game_objects/units/base";
-import {GameConfig} from "../../../config";
+import {GameConfig, MapLayout} from "../../../config";
 import Game = Phaser.Game;
 import {GridCell} from "../../../game_objects/grid/grid_cell";
 import {WaterCell} from "../../../game_objects/grid/water";
@@ -43,8 +43,12 @@ export class GridController extends BaseController {
 
 		this.isoGridGroup = this._game['isoGridGroup'];
 
-		for (let xx = 0; xx < this._config.map[0].length; xx++) {
-			for (let yy = 0; yy < this._config.map.length; yy++) {
+		let mapName = 'demo'; //TODO: move this into a separate loadMap fn or mapBuilder
+
+		let mapLayout: string[][] = this._config.maps.find(x => x.name === mapName).layout;
+
+		for (let xx = 0; xx < mapLayout[0].length; xx++) {
+			for (let yy = 0; yy < mapLayout.length; yy++) {
 				// Create a tile using the new game.add.isoSprite factory method at the specified position.
 				// The last parameter is the group you want to add it to (just like game.add.sprite)
 				let tileSpr = this._game.add.isoSprite(xx * this._config.cellSize, yy * this._config.cellSize, 0, 'tile', 0, this.isoGridGroup);
@@ -53,13 +57,13 @@ export class GridController extends BaseController {
 				let newCell: GridCell; 
 
 				//TODO: move to map builder or use a type map
-				if (this._config.map[yy][xx] === 'W') {
+				if (mapLayout[yy][xx] === 'W') {
 					newCell = new WaterCell(tileSpr, xx, yy);
 					let waterAnimation = this._game.add.tween(newCell.spr).to({isoZ: -5}, 800, Phaser.Easing.Sinusoidal.InOut, false, 0, 0, true).loop(true);
 					setTimeout(() => waterAnimation.start(), Math.random() * 1000);
-				} else if (this._config.map[yy][xx] === 'M') {
+				} else if (mapLayout[yy][xx] === 'M') {
 					newCell = new MountainCell(tileSpr, xx, yy);
-				} else if (this._config.map[yy][xx] === 'B') {
+				} else if (mapLayout[yy][xx] === 'B') {
 					newCell = new BridgeCell(tileSpr, xx, yy);
 				} else {
 					newCell = new GridCell(tileSpr, xx, yy);
@@ -228,7 +232,6 @@ export class GridController extends BaseController {
 				cell.pathFromActiveCell = previousCell.pathFromActiveCell.concat([direction]);
 			}
 		}
-
 
 		if (direction !== 'left' && previousDirection !== 'left') //prevent pointless U-turns
 			this._highlightCellsInRange(this.cells.find(c => c.x === cell.x + 1 && c.y === cell.y), range - 1, isAttack, cell, direction);
