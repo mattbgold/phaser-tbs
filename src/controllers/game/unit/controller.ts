@@ -3,12 +3,11 @@ import {injectable, inject} from "inversify";
 import Game = Phaser.Game;
 import {BaseUnit} from "../../../game_objects/units/base";
 import {GameController, GameEvent} from "../controller";
-import {InputController} from "../../input/controller";
 import {GridCell} from "../../../game_objects/grid/grid_cell";
 import {BaseController} from "../../base";
 import Tween = Phaser.Tween;
 import {GameConfig} from "../../../config";
-import {ArmyBuilder} from "../../../services/army_builder";
+import {IMapBuilder} from "../../../services/map_builder/interface";
 
 
 @injectable()
@@ -18,10 +17,9 @@ export class UnitController extends BaseController {
 
 	constructor(
 		private _game: Game, 
-		private _ctrl: GameController, 
-		private _input: InputController, 
+		public _ctrl: GameController,
 		@inject('config') private _config: GameConfig,
-	    private _armyBuilder: ArmyBuilder
+		@inject('IMapBuilder') private _mapBuilder: IMapBuilder
 	) {
 		super();
 	}
@@ -34,11 +32,13 @@ export class UnitController extends BaseController {
 		this._ctrl.subscribe(GameEvent.UnitMove, this._onUnitMove);
 		this._ctrl.subscribe(GameEvent.UnitAttack, this._onUnitAttack);
 		
-		this.units = this._armyBuilder.build();
+		this.units = this._mapBuilder.buildUnits();
 		this._ctrl.set('units', this.units);
 	}
 
-	update() { }
+	update() {
+		this._game.iso.simpleSort(this._game['isoUnitsGroup']);
+	}
 
 	render() {
 		if(!!this._selectedUnit) {
@@ -66,10 +66,13 @@ export class UnitController extends BaseController {
 		this._selectedUnit = null;
 	};
 
-	private _onUnitMove = (cell: GridCell): void => {
-		this._moveUnit(this._selectedUnit, cell);
+	private _onUnitMove = (destinationCell: GridCell): void => {
+		if(!destinationCell)
+			return;
+		
+		this._moveUnit(this._selectedUnit, destinationCell)
 	};
-	
+
 	private _onUnitAttack = (defendingUnit: BaseUnit): void => {
 		if (!this._selectedUnit)
 			console.error('Cannot attack, no unit selected!', defendingUnit);
@@ -134,7 +137,7 @@ export class UnitController extends BaseController {
 	private _handleCombat(attackingUnit: BaseUnit, defendingUnit: BaseUnit): void {
 		let damage = attackingUnit.stats.attack - defendingUnit.stats.armor;
 
-		//face each other
+		// make units face each other when attacking
 		attackingUnit.pointToUnit(defendingUnit);
 		defendingUnit.pointToUnit(attackingUnit);
 
@@ -162,14 +165,6 @@ export class UnitController extends BaseController {
 		});
 	}
 
-	//TODO: delete me at some point
-	// private _createUnit(unit: Unit): BaseUnit {
-	// 	let spr = this._game.add.isoSprite(unit.x*this._config.cellSize, unit.y*this._config.cellSize, 0, unit.asset, 0);
-	// 	let unitObj = new (this.unitTypeMap[unit.name])(unit, spr);
-	//
-	// 	this.units.push(unitObj);
-	// 	return unitObj;
-	// }
 	//TODO: we need some kind of TurnExecutor to run the turn in sequence.
 	// for the team in action phase, execute the moves and actions one at a time
 }

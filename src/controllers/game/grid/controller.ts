@@ -5,16 +5,12 @@ import {InputController, InputEvent} from "../../input/controller";
 import {BaseController} from "../../base";
 import Group = Phaser.Group;
 import {BaseUnit} from "../../../game_objects/units/base";
-import {GameConfig, MapLayout} from "../../../config";
 import Game = Phaser.Game;
 import {GridCell} from "../../../game_objects/grid/grid_cell";
-import {WaterCell} from "../../../game_objects/grid/water";
-import {BridgeCell} from "../../../game_objects/grid/bridge";
-import {MountainCell} from "../../../game_objects/grid/mountain";
+import {IMapBuilder} from "../../../services/map_builder/interface";
 
 @injectable()
 export class GridController extends BaseController {
-	isoGridGroup: Group;
 	cells: GridCell[];
 
 	private _activeCell: GridCell;
@@ -24,13 +20,11 @@ export class GridController extends BaseController {
 
 	constructor(
 		private _game: Game,
-		private _ctrl: GameController, 
+		public _ctrl: GameController,
 		private _input: InputController,
-		@inject('config') private _config: GameConfig
+		@inject('IMapBuilder') private _mapBuilder: IMapBuilder
 	) {
 		super();
-		this.cells = [];
-		_ctrl.set('cells', this.cells);
 	}
 
 	init(): void {
@@ -38,40 +32,13 @@ export class GridController extends BaseController {
 		this._ctrl.subscribe(GameEvent.UnitMoveActionSelected, this._onMoveActionSelected);
 		this._ctrl.subscribe(GameEvent.UnitAttackActionSelected, this._onAttackActionSelected);
 		this._ctrl.subscribe(GameEvent.CancelAction, this._onCancelAction);
-		this._ctrl.subscribe(GameEvent.UnitMove, () => this._canActivateCells = false);
-		this._ctrl.subscribe(GameEvent.UnitMoveCompleted, () => this._canActivateCells = true);
+		this._ctrl.subscribe(GameEvent.UnitMove, (): void => {this._canActivateCells = false;}); // returning false will cancel the event.
+		this._ctrl.subscribe(GameEvent.UnitMoveCompleted, (): void => {this._canActivateCells = true;});
 
-		this.isoGridGroup = this._game['isoGridGroup'];
-
-		let mapName = 'demo'; //TODO: move this into a separate loadMap fn or mapBuilder
-
-		let mapLayout: string[][] = this._config.maps.find(x => x.name === mapName).layout;
-
-		for (let xx = 0; xx < mapLayout[0].length; xx++) {
-			for (let yy = 0; yy < mapLayout.length; yy++) {
-				// Create a tile using the new game.add.isoSprite factory method at the specified position.
-				// The last parameter is the group you want to add it to (just like game.add.sprite)
-				let tileSpr = this._game.add.isoSprite(xx * this._config.cellSize, yy * this._config.cellSize, 0, 'tile', 0, this.isoGridGroup);
-				tileSpr.anchor.set(0.5, 0);
-				
-				let newCell: GridCell; 
-
-				//TODO: move to map builder or use a type map
-				if (mapLayout[yy][xx] === 'W') {
-					newCell = new WaterCell(tileSpr, xx, yy);
-					let waterAnimation = this._game.add.tween(newCell.spr).to({isoZ: -5}, 800, Phaser.Easing.Sinusoidal.InOut, false, 0, 0, true).loop(true);
-					setTimeout(() => waterAnimation.start(), Math.random() * 1000);
-				} else if (mapLayout[yy][xx] === 'M') {
-					newCell = new MountainCell(tileSpr, xx, yy);
-				} else if (mapLayout[yy][xx] === 'B') {
-					newCell = new BridgeCell(tileSpr, xx, yy);
-				} else {
-					newCell = new GridCell(tileSpr, xx, yy);
-				}
-
-				this.cells.push(newCell);
-			}
-		}
+		this.cells = this._mapBuilder.buildGrid();
+		this._ctrl.set('cells', this.cells);
+		
+		this._game.iso.simpleSort(this._game['isoGridGroup']);
 	}
 	
 	update() {

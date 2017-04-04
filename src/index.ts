@@ -44,6 +44,7 @@ class TbsGame {
 
     //game settings
     this.game.iso.anchor.setTo(0.5, 0.2);
+    //TODO: move to controller preload()
     this.game['isoGridGroup'] = this.game.add.group();
     this.game['isoUnitsGroup'] = this.game.add.group();
   }

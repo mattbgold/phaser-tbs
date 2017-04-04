@@ -1,0 +1,8 @@
+import {GridCell} from "../../game_objects/grid/grid_cell";
+import {BaseUnit} from "../../game_objects/units/base";
+
+export interface IMapBuilder {
+	load(mapName: string): void;
+	buildUnits(): BaseUnit[];
+	buildGrid(): GridCell[];
+}
