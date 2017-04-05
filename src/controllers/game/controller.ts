@@ -5,13 +5,13 @@ import {GameConfig} from "../../config";
 import Signal = Phaser.Signal;
 import {BaseController} from "../base";
 import {IMapBuilder} from "../../services/map_builder/interface";
+import {GameEvent, GameStateManager} from "../../services/state/game/service";
 
 @injectable()
 export class GameController extends BaseController {
-	private _cache: {[key:string]: any} = {};
-
 	constructor(
 		private _game: Game,
+		@inject('gameState') private _gameState: GameStateManager,
 		@inject('config') private _config: GameConfig,
 		@inject('IMapBuilder') private _mapBuilder: IMapBuilder
 	) {
@@ -19,8 +19,8 @@ export class GameController extends BaseController {
 	}
 
 	init() {
-		  for(let i in [0,1,2,3,4, 5, 6, 7, 8]) {
-		  	this.subscribe(parseInt(i), _ => console.log(GameEvent[parseInt(i)], _));
+		  for(let i in [GameEvent.TurnStart, GameEvent.TurnComplete]) {
+		  	this._gameState.subscribe(parseInt(i), _ => console.log(GameEvent[parseInt(i)], _));
 		  }
 		
 		this._mapBuilder.load('demo');
@@ -33,22 +33,5 @@ export class GameController extends BaseController {
 		this._game.debug.text(this._game.time.fps || '--', 2, 14, "#a7aebe");
 	}
 	
-	set(key: string, obj: any):void {
-		this._cache[key] = obj;
-	}
-	get(key: string) {
-		return this._cache[key];
-	}
-}
-
-export enum GameEvent {
-	GridCellActivated,
-	UnitSelected,
-	UnitMoveActionSelected,
-	UnitMove,
-	UnitMoveCompleted,
-	UnitAttackActionSelected,
-	UnitAttack,
-	UnitAttackCompleted,
-	CancelAction
+	
 }

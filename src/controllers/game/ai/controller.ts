@@ -1,16 +1,16 @@
 import * as Phaser from 'phaser'
 import {BaseController} from "../../base";
 import {GameConfig} from "../../../config";
-import {InputController} from "../../input/controller";
-import {GameController} from "../controller";
 import Game = Phaser.Game;
 import {inject} from "inversify";
+import {GameStateManager} from "../../../services/state/game/service";
+import {InputStateManager} from "../../../services/state/input/service";
 
 export class AIController extends BaseController {
 	constructor(
 		private _game: Game,
-		private _ctrl: GameController,
-		private _input: InputController,
+		@inject('gameState') private _gameState: GameStateManager,
+		@inject('inputState') private _inputState: InputStateManager,
 		@inject('config') private _config: GameConfig
 	) {
 		super();

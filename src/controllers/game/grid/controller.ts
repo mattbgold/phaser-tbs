@@ -1,13 +1,13 @@
 import * as Phaser from 'phaser';
 import {injectable, inject} from "inversify";
-import {GameController, GameEvent} from "../controller";
-import {InputController, InputEvent} from "../../input/controller";
 import {BaseController} from "../../base";
 import Group = Phaser.Group;
 import {BaseUnit} from "../../../game_objects/units/base";
 import Game = Phaser.Game;
 import {GridCell} from "../../../game_objects/grid/grid_cell";
 import {IMapBuilder} from "../../../services/map_builder/interface";
+import {GameStateManager, GameEvent} from "../../../services/state/game/service";
+import {InputStateManager, InputEvent} from "../../../services/state/input/service";
 
 @injectable()
 export class GridController extends BaseController {
@@ -20,23 +20,23 @@ export class GridController extends BaseController {
 
 	constructor(
 		private _game: Game,
-		public _ctrl: GameController,
-		private _input: InputController,
+		@inject('gameState') private _gameState: GameStateManager,
+		@inject('inputState') private _inputState: InputStateManager,
 		@inject('IMapBuilder') private _mapBuilder: IMapBuilder
 	) {
 		super();
 	}
 
 	init(): void {
-		this._input.subscribe(InputEvent.Tap, this._onTap);
-		this._ctrl.subscribe(GameEvent.UnitMoveActionSelected, this._onMoveActionSelected);
-		this._ctrl.subscribe(GameEvent.UnitAttackActionSelected, this._onAttackActionSelected);
-		this._ctrl.subscribe(GameEvent.CancelAction, this._onCancelAction);
-		this._ctrl.subscribe(GameEvent.UnitMove, (): void => {this._canActivateCells = false;}); // returning false will cancel the event.
-		this._ctrl.subscribe(GameEvent.UnitMoveCompleted, (): void => {this._canActivateCells = true;});
+		this._inputState.subscribe(InputEvent.Tap, this._onTap);
+		this._gameState.subscribe(GameEvent.UnitMoveActionSelected, this._onMoveActionSelected);
+		this._gameState.subscribe(GameEvent.UnitAttackActionSelected, this._onAttackActionSelected);
+		this._gameState.subscribe(GameEvent.CancelAction, this._onCancelAction);
+		this._gameState.subscribe(GameEvent.UnitMove, (): void => {this._canActivateCells = false;}); // returning false will cancel the event.
+		this._gameState.subscribe(GameEvent.UnitMoveCompleted, (): void => {this._canActivateCells = true;});
 
 		this.cells = this._mapBuilder.buildGrid();
-		this._ctrl.set('cells', this.cells);
+		this._gameState.set('cells', this.cells);
 		
 		this._game.iso.simpleSort(this._game['isoGridGroup']);
 	}
@@ -45,7 +45,7 @@ export class GridController extends BaseController {
 		this.cells.forEach(cell =>  {
 			if (cell.blocksAttack || cell.blocksMove)
 				return;
-			let inBounds = cell.spr.isoBounds.containsXY(this._input.cursorPos.x, this._input.cursorPos.y);
+			let inBounds = cell.spr.isoBounds.containsXY(this._inputState.cursorPos.x, this._inputState.cursorPos.y);
 
 			//is the mouse hovering over a tile?
 			if (inBounds) {
@@ -110,12 +110,12 @@ export class GridController extends BaseController {
 			// if we tapped a destination cell for MOVE action
 			if (!!this._highlightCellsForMove && clickedCell.highlighted) {
 				this._unhighlightAll();
-				this._ctrl.dispatch(GameEvent.UnitMove, clickedCell);
+				this._gameState.dispatch(GameEvent.UnitMove, clickedCell);
 			}
 			// else if we tapped a target cell for ATTACK action
 			else if (!!this._highlightCellsForAttack && clickedCell.highlighted && !!unitAtClickedCell) {
 				this._unhighlightAll();
-				this._ctrl.dispatch(GameEvent.UnitAttack, unitAtClickedCell);
+				this._gameState.dispatch(GameEvent.UnitAttack, unitAtClickedCell);
 			}
 			// else we tapped an inactive cell not tied to any action
 			else {
@@ -125,8 +125,8 @@ export class GridController extends BaseController {
 				this._activeCell = clickedCell;
 
 				// we didn't tap a cell for an action, so lets cancel any pending actions
-				this._ctrl.dispatch(GameEvent.CancelAction, clickedCell);
-				this._ctrl.dispatch(GameEvent.GridCellActivated, clickedCell);
+				this._gameState.dispatch(GameEvent.CancelAction, clickedCell);
+				this._gameState.dispatch(GameEvent.GridCellActivated, clickedCell);
 			}
 		}
 	};
@@ -211,7 +211,7 @@ export class GridController extends BaseController {
 	}
 
 	private _getUnitAt(cell: GridCell): BaseUnit {
-		let units: BaseUnit[] = this._ctrl.get('units');
+		let units: BaseUnit[] = this._gameState.get('units');
 
 		return units.find(unit => unit.x === cell.x && unit.y === cell.y)
 	}

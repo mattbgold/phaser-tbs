@@ -11,6 +11,13 @@ import {GameConfig, getConfig} from "./config";
 import {IMapBuilder} from "./services/map_builder/interface";
 import {MapBuilder} from "./services/map_builder/service";
 import Factory = interfaces.Factory;
+import {IArmyCommandStrategy} from "./services/army_command_strategy/interface";
+import {ArmyCommandStrategy} from "./services/army_command_strategy/service";
+import {ArmyCommandStrategyFactory} from "./services/army_command_strategy/factory/service";
+import {IArmyCommandStrategyFactory} from "./services/army_command_strategy/factory/interface";
+import {IStateManager} from "./services/state/interface";
+import {GameStateManager} from "./services/state/game/service";
+import {InputStateManager} from "./services/state/input/service";
 
 let container = new Container();
 
@@ -22,7 +29,12 @@ container.bind<ContextMenuController>(ContextMenuController).toSelf().inSingleto
 container.bind<GridController>(GridController).toSelf().inSingletonScope();
 container.bind<UnitController>(UnitController).toSelf().inSingletonScope();
 
+container.bind<IStateManager>('gameState').to(GameStateManager).inSingletonScope();
+container.bind<IStateManager>('inputState').to(InputStateManager).inSingletonScope();
+
 container.bind<IMapBuilder>('IMapBuilder').to(MapBuilder).inSingletonScope();
+
+container.bind<IArmyCommandStrategyFactory>('IArmyCommandStrategyFactory').to(ArmyCommandStrategyFactory).inSingletonScope();
 
 container.bind<Factory<BaseController[]>>('controllers').toFactory<BaseController[]>((context: interfaces.Context) => {
 	return () => [
