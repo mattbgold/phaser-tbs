@@ -29,8 +29,8 @@ container.bind<ContextMenuController>(ContextMenuController).toSelf().inSingleto
 container.bind<GridController>(GridController).toSelf().inSingletonScope();
 container.bind<UnitController>(UnitController).toSelf().inSingletonScope();
 
-container.bind<IStateManager>('gameState').to(GameStateManager).inSingletonScope();
-container.bind<IStateManager>('inputState').to(InputStateManager).inSingletonScope();
+container.bind<GameStateManager>(GameStateManager).toSelf().inSingletonScope();
+container.bind<InputStateManager>(InputStateManager).toSelf().inSingletonScope();
 
 container.bind<IMapBuilder>('IMapBuilder').to(MapBuilder).inSingletonScope();
 

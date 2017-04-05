@@ -11,7 +11,7 @@ import {GameEvent, GameStateManager} from "../../services/state/game/service";
 export class GameController extends BaseController {
 	constructor(
 		private _game: Game,
-		@inject('gameState') private _gameState: GameStateManager,
+		private _gameState: GameStateManager,
 		@inject('config') private _config: GameConfig,
 		@inject('IMapBuilder') private _mapBuilder: IMapBuilder
 	) {

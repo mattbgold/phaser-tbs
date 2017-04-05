@@ -14,8 +14,8 @@ export class ContextMenuController extends BaseController {
 
 	constructor(
 		private _game: Game,
-		@inject('gameState') private _gameState: GameStateManager,
-		@inject('inputState') private _inputState: InputStateManager,
+		private _gameState: GameStateManager,
+		private _inputState: InputStateManager,
 		@inject('config') private _config: GameConfig
 	) {
 		super();

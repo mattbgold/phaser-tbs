@@ -16,7 +16,7 @@ export class UnitController extends BaseController {
 
 	constructor(
 		private _game: Game,
-		@inject('gameState') private _gameState: GameStateManager,
+		private _gameState: GameStateManager,
 		@inject('config') private _config: GameConfig,
 		@inject('IMapBuilder') private _mapBuilder: IMapBuilder
 	) {
@@ -32,7 +32,7 @@ export class UnitController extends BaseController {
 		this._gameState.subscribe(GameEvent.UnitAttack, this._onUnitAttack);
 		
 		this.units = this._mapBuilder.buildUnits();
-		this._gameState.set('units', this.units);
+		this._gameState.units = this.units;
 	}
 
 	update() {

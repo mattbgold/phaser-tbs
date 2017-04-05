@@ -20,8 +20,8 @@ export class GridController extends BaseController {
 
 	constructor(
 		private _game: Game,
-		@inject('gameState') private _gameState: GameStateManager,
-		@inject('inputState') private _inputState: InputStateManager,
+		private _gameState: GameStateManager,
+		private _inputState: InputStateManager,
 		@inject('IMapBuilder') private _mapBuilder: IMapBuilder
 	) {
 		super();
@@ -36,7 +36,7 @@ export class GridController extends BaseController {
 		this._gameState.subscribe(GameEvent.UnitMoveCompleted, (): void => {this._canActivateCells = true;});
 
 		this.cells = this._mapBuilder.buildGrid();
-		this._gameState.set('cells', this.cells);
+		this._gameState.cells = this.cells;
 		
 		this._game.iso.simpleSort(this._game['isoGridGroup']);
 	}
@@ -211,9 +211,7 @@ export class GridController extends BaseController {
 	}
 
 	private _getUnitAt(cell: GridCell): BaseUnit {
-		let units: BaseUnit[] = this._gameState.get('units');
-
-		return units.find(unit => unit.x === cell.x && unit.y === cell.y)
+		return this._gameState.units.find(unit => unit.x === cell.x && unit.y === cell.y)
 	}
 
 	private _getCellAt(unit: BaseUnit): GridCell {

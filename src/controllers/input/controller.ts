@@ -13,8 +13,10 @@ export class InputController extends BaseController {
 	private _attackKey: Key; //TODO: move all shortcut keys to a map
 	private _isAttackKeyDown: boolean;
 
-	constructor(private _game: Game,
-	            @inject('inputState') private _inputState: InputStateManager){
+	constructor(
+		private _game: Game, 
+        private _inputState: InputStateManager
+	) {
 		super();
 	}
 
