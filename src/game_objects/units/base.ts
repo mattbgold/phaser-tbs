@@ -12,7 +12,10 @@ export abstract class BaseUnit implements Unit {
 	asset: string;
 
 	belongsToPlayer: number;
-
+	
+	hasMovedThisTurn: boolean;
+	selectedAction: any;
+	
 	x: number;
 	y: number;
 

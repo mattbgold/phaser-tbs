@@ -11,11 +11,8 @@ import {GameConfig, getConfig} from "./config";
 import {IMapBuilder} from "./services/map_builder/interface";
 import {MapBuilder} from "./services/map_builder/service";
 import Factory = interfaces.Factory;
-import {IArmyCommandStrategy} from "./services/army_command_strategy/interface";
-import {ArmyCommandStrategy} from "./services/army_command_strategy/service";
 import {ArmyCommandStrategyFactory} from "./services/army_command_strategy/factory/service";
 import {IArmyCommandStrategyFactory} from "./services/army_command_strategy/factory/interface";
-import {IStateManager} from "./services/state/interface";
 import {GameStateManager} from "./services/state/game/service";
 import {InputStateManager} from "./services/state/input/service";
 

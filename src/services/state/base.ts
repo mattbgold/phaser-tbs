@@ -1,5 +1,4 @@
 import * as Phaser from 'phaser'
-import {IStateManager} from "./interface";
 import Signal = Phaser.Signal;
 import {injectable} from "inversify";
 
