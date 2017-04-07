@@ -97,7 +97,7 @@ export class MapBuilder implements IMapBuilder {
 	}
 
 	private _mapToBaseUnit = (unit: Unit): BaseUnit => {
-		let spr = this._game.add.isoSprite(unit.x * this._config.cellSize, unit.y * this._config.cellSize, 0, unit.asset, 0, this._game['isoUnitsGroup']);
+		let spr = this._game.add.isoSprite(unit.x * this._config.cellSize, unit.y * this._config.cellSize, 0, `${unit.asset}_${unit.belongsToPlayer}`, 0, this._game['isoUnitsGroup']);
 
 		spr.anchor.set(0.5, 0.3);
 		return new (this._unitTypeMap[unit.name])(unit, spr);

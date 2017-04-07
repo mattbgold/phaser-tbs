@@ -33,7 +33,10 @@ class TbsGame {
     this.game.load.spritesheet('explosion', './assets/images/sprites/explosion.png',130, 130, 39);
     for(let name in this.config.units) {
       let asset = this.config.units[name].asset;
-      this.game.load.image(asset, `./assets/images/${asset}.gif`)
+      this.game.load.image(`${asset}_0`, `./assets/images/${asset}_0.png`);
+      this.game.load.image(`${asset}_1`, `./assets/images/${asset}_1.png`);
+      this.game.load.image(`${asset}_2`, `./assets/images/${asset}_2.png`);
+      this.game.load.image(`${asset}_3`, `./assets/images/${asset}_3.png`);
     }
 
     //game engine settings

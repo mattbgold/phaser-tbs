@@ -57,7 +57,8 @@ export class UnitController extends BaseController {
 			this._gameState.dispatch(GameEvent.UnitSelected, unitAtCell);
 			
 			//TODO: delete me - temporary to test move overlay
-			this._gameState.dispatch(GameEvent.UnitMoveActionSelected, unitAtCell)
+			if(!unitAtCell.hasMovedThisTurn)
+				this._gameState.dispatch(GameEvent.UnitMoveActionSelected, unitAtCell)
 		}
 	};
 
@@ -146,21 +147,24 @@ export class UnitController extends BaseController {
 		}
 
 		attackerAnimation.onComplete.add(() => {
-			if(!damage) return;
+			if(damage) {
+				defendingUnit.hp -= damage;
 
-			defendingUnit.hp -= damage;
+				if (defendingUnit.isDead) {
+					this._deadUnits.push(this.units.splice(this.units.indexOf(defendingUnit), 1)[0]);
+					defendingUnit.x = -1;
+					defendingUnit.y = -1;
 
-			if(defendingUnit.isDead) {
-				this._deadUnits.push(this.units.splice(this.units.indexOf(defendingUnit), 1)[0]);
-
-				//TODO: remove this later
-				let explosion = this._game.add.sprite(defendingUnit.spr.x, defendingUnit.spr.y, 'explosion');
-				explosion.anchor.set(.5, .5);
-				explosion.scale.set(.5, .5);
-				explosion.animations.add('explode');
-				explosion.animations.play('explode', 30, false, true);
-				defendingUnit.spr.kill();
+					//TODO: remove this later
+					let explosion = this._game.add.sprite(defendingUnit.spr.x, defendingUnit.spr.y, 'explosion');
+					explosion.anchor.set(.5, .5);
+					explosion.scale.set(.5, .5);
+					explosion.animations.add('explode');
+					explosion.animations.play('explode', 30, false, true);
+					defendingUnit.spr.kill();
+				}
 			}
+			this._gameState.dispatch(GameEvent.UnitAttackCompleted, attackingUnit);
 		});
 	}
 

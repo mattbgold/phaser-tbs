@@ -46,6 +46,41 @@ export function getConfig(): GameConfig {
 
 				['W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W'],
 			]
+		}, {
+			name: 'demo2',
+			armies: [
+				['tank', 'tank', 'tank', 'assault'],
+				['scout', 'scout', 'tank', 'assault', 'assault', 'assault'],
+				['assault', 'assault', 'assault', 'assault', 'assault'],
+				['scout', 'scout', 'scout', 'assault', 'tank', 'tank']
+			],
+			layout: [
+				['0', '0', 'W', 'W', ' ', ' ', 'W', 'W', ' ', ' ', 'M', '1', '1'],
+
+				[' ', '0', 'W', 'W', ' ', ' ', ' ', 'W', ' ', 'M', 'M', '1', '1'],
+
+				['0', ' ', 'B', ' ', ' ', ' ', ' ', 'W', ' ', 'M', 'W', '1', '1'],
+
+				['W', 'W', 'W', ' ', 'M', ' ', ' ', 'B', ' ', ' ', 'W', 'W', 'B'],
+
+				['W', 'M', ' ', ' ', 'M', ' ', ' ', 'B', ' ', ' ', ' ', ' ', ' '],
+
+				[' ', ' ', ' ', ' ', ' ', ' ', 'W', 'W', ' ', ' ', ' ', ' ', ' '],
+
+				['W', 'W', 'W', ' ', ' ', ' ', 'W', 'W', ' ', ' ', ' ', ' ', ' '],
+
+				[' ', ' ', 'W', 'B', 'B', 'W', 'W', 'W', ' ', 'M', ' ', ' ', ' '],
+
+				['M', ' ', ' ', ' ', ' ', 'W', 'W', 'W', ' ', ' ', ' ', ' ', 'W'],
+
+				['M', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', 'W', 'W'],
+
+				['M', 'M', ' ', ' ', ' ', ' ', 'M', ' ', ' ', 'W', ' ', ' ', '3'],
+
+				['2', '2', ' ', 'M', ' ', 'M', 'M', ' ', 'W', 'W', ' ', '3', '3'],
+
+				['2', '2', '2', 'M', ' ', ' ', ' ', ' ', 'W', 'W', '3', '3', '3'],
+			]
 		}],
 		units: {
 			'scout': {
@@ -57,7 +92,7 @@ export function getConfig(): GameConfig {
 					hp: 4,
 					mov: 5,
 					range: 3,
-					sight: 5,
+					sight: 4,
 					cost: 2
 				},
 			},
@@ -70,7 +105,7 @@ export function getConfig(): GameConfig {
 					hp: 5,
 					mov: 3,
 					range: 3,
-					sight: 4,
+					sight: 3,
 					cost: 3
 				},
 			},

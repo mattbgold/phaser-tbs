@@ -12,6 +12,10 @@ export class GameStateManager extends BaseStateManager {
 
 	units: BaseUnit[];
 	cells: GridCell[];
+	
+	getNumOfPlayers() {
+		return this.units.reduce((playerNums, unit) => playerNums.indexOf(unit.belongsToPlayer) > -1 ? playerNums: playerNums.concat(unit.belongsToPlayer), []).length;
+	}
 }
 
 export enum GameEvent {

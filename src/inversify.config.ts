@@ -15,6 +15,7 @@ import {ArmyCommandStrategyFactory} from "./services/army_command_strategy/facto
 import {IArmyCommandStrategyFactory} from "./services/army_command_strategy/factory/interface";
 import {GameStateManager} from "./services/state/game/service";
 import {InputStateManager} from "./services/state/input/service";
+import {AIController} from "./controllers/game/ai/controller";
 
 let container = new Container();
 
@@ -25,6 +26,7 @@ container.bind<GameController>(GameController).toSelf().inSingletonScope();
 container.bind<ContextMenuController>(ContextMenuController).toSelf().inSingletonScope();
 container.bind<GridController>(GridController).toSelf().inSingletonScope();
 container.bind<UnitController>(UnitController).toSelf().inSingletonScope();
+container.bind<AIController>(AIController).toSelf().inSingletonScope();
 
 container.bind<GameStateManager>(GameStateManager).toSelf().inSingletonScope();
 container.bind<InputStateManager>(InputStateManager).toSelf().inSingletonScope();
@@ -41,6 +43,7 @@ container.bind<Factory<BaseController[]>>('controllers').toFactory<BaseControlle
 		context.container.get<ContextMenuController>(ContextMenuController),
 		context.container.get<GridController>(GridController),
 		context.container.get<UnitController>(UnitController),
+		context.container.get<AIController>(AIController)
 	];
 });
 

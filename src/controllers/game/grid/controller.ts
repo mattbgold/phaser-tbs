@@ -177,7 +177,22 @@ export class GridController extends BaseController {
 			|| (cell.active && !!previousCell)) //if we looped back to the original cell, just stop
 			return;
 
-		if((isAttack || !this._getUnitAt(cell)) && !cell.blocksMove) {
+		let unitAtCell = this._getUnitAt(cell);
+
+		let playerNum: number = isAttack ? this._highlightCellsForAttack.belongsToPlayer : this._highlightCellsForMove.belongsToPlayer;
+
+		//dont allow move or attack through enemy units
+		if(unitAtCell && unitAtCell.belongsToPlayer !== playerNum) {
+			if(!isAttack)
+				return;
+			else {
+				let unitAtPreviousCell = this._getUnitAt(previousCell);
+				if(unitAtPreviousCell &&  unitAtPreviousCell.belongsToPlayer !== playerNum)
+					return;
+			}
+		}
+
+		if((isAttack || !unitAtCell) && !cell.blocksMove) {
 			// if the cell is not occupied, highlight it
 			cell.highlighted = true;
 
