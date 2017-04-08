@@ -21,15 +21,11 @@ export class ContextMenuController extends BaseController {
 		super();
 	}
 
-	init() {
+	create() {
 		this._gameState.subscribe(GameEvent.UnitSelected, unit => this._selectedUnit = unit);
 		this._gameState.subscribe(GameEvent.CancelAction, unit => this._selectedUnit = null);
 		this._inputState.subscribe(InputEvent.KeyAttack, this._onKeyAttack);
 	}
-
-	update() { }
-
-	render() { }
 
 	// ------------------------------------
 	// ---------- EVENT HANDLERS ----------

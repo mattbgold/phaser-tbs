@@ -27,7 +27,7 @@ export class GridController extends BaseController {
 		super();
 	}
 
-	init(): void {
+	create(): void {
 		this._inputState.subscribe(InputEvent.Tap, this._onTap);
 		this._gameState.subscribe(GameEvent.UnitMoveActionSelected, this._onMoveActionSelected);
 		this._gameState.subscribe(GameEvent.UnitAttackActionSelected, this._onAttackActionSelected);
@@ -81,8 +81,6 @@ export class GridController extends BaseController {
 			}
 		});
 	}
-
-	render(){ }
 	
 	// ------------------------------------
 	// ---------- EVENT HANDLERS ----------

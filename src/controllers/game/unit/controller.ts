@@ -25,11 +25,13 @@ export class UnitController extends BaseController {
 
 	units: BaseUnit[];
 
-	init() {
+	create() {
 		this._gameState.subscribe(GameEvent.GridCellActivated, this._onCellActivated);
 		this._gameState.subscribe(GameEvent.CancelAction, this._onCancelAction);
 		this._gameState.subscribe(GameEvent.UnitMove, this._onUnitMove);
+		this._gameState.subscribe(GameEvent.UnitMoveCompleted, this._onUnitMoveCompleted);
 		this._gameState.subscribe(GameEvent.UnitAttack, this._onUnitAttack);
+		this._gameState.subscribe(GameEvent.TurnComplete, this._onTurnComplete);
 		
 		this.units = this._mapBuilder.buildUnits();
 		this._gameState.units = this.units;
@@ -73,13 +75,21 @@ export class UnitController extends BaseController {
 		this._moveUnit(this._selectedUnit, destinationCell)
 	};
 
+	private _onUnitMoveCompleted = (unit: BaseUnit): void => {
+		unit.hasMovedThisTurn = true;	
+	};
+	
 	private _onUnitAttack = (defendingUnit: BaseUnit): void => {
 		if (!this._selectedUnit)
 			console.error('Cannot attack, no unit selected!', defendingUnit);
 		
 		this._handleCombat(this._selectedUnit, defendingUnit);
 	};
-	
+
+	private _onTurnComplete = (playerNum: number): void => {
+		this.units.filter(u => u.belongsToPlayer === playerNum).forEach(u => u.hasMovedThisTurn = false);
+	};
+
 	// ---------------------------------------
 	// ---------- HELPER FUNCTIONS  ----------
 	// ---------------------------------------
@@ -94,27 +104,29 @@ export class UnitController extends BaseController {
 		let xPos = [unit.x];
 		let yPos = [unit.y];
 
+		let time = 100;
+		
 		for(let i in path) {
 			switch(path[i]) {
 				case 'up':
 					yPos.push(--yy);
 					xPos.push(xx);
-					tween.to({ isoY: (yy) * this._config.cellSize }, 150, Phaser.Easing.Linear.None);
+					tween.to({ isoY: (yy) * this._config.cellSize }, time, Phaser.Easing.Linear.None);
 					break;
 				case 'down':
 					yPos.push(++yy);
 					xPos.push(xx);
-					tween.to({ isoY: (yy) * this._config.cellSize }, 150, Phaser.Easing.Linear.None);
+					tween.to({ isoY: (yy) * this._config.cellSize }, time, Phaser.Easing.Linear.None);
 					break;
 				case 'left':
 					xPos.push(--xx);
 					yPos.push(yy);
-					tween.to({ isoX: (xx) * this._config.cellSize }, 150, Phaser.Easing.Linear.None);
+					tween.to({ isoX: (xx) * this._config.cellSize }, time, Phaser.Easing.Linear.None);
 					break;
 				case 'right':
 					xPos.push(++xx);
 					yPos.push(yy);
-					tween.to({ isoX: (xx) * this._config.cellSize }, 150, Phaser.Easing.Linear.None);
+					tween.to({ isoX: (xx) * this._config.cellSize }, time, Phaser.Easing.Linear.None);
 					break;
 				default:
 					console.error('Invalid path');

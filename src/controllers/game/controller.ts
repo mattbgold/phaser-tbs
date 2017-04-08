@@ -18,15 +18,12 @@ export class GameController extends BaseController {
 		super();
 	}
 
-	init() {
+	create() {
 		  for(let i in [0, 1, 2, 3, 4, 5, 6, 7 ,8 ,9, 10]) {
 		  	this._gameState.subscribe(parseInt(i), _ => console.log(GameEvent[parseInt(i)], _));
 		  }
 		
 		this._mapBuilder.load('demo2');
-	}
-
-	update() {
 	}
 	
 	render() {

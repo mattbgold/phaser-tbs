@@ -1,6 +1,5 @@
 import * as Phaser from 'phaser';
 import {IArmyCommandStrategy} from "./interface";
-import {GameController} from "../../controllers/game/controller";
 import Game = Phaser.Game;
 import {GameStateManager, GameEvent} from "../state/game/service";
 import {BaseUnit} from "../../game_objects/units/base";
@@ -10,48 +9,30 @@ import {GameConfig} from "../../config";
 import {GridCell} from "../../game_objects/grid/grid_cell";
 
 export class DemoArmyCommandStrategy implements IArmyCommandStrategy {
-
-	private _myUnits: BaseUnit[];
-
 	private _spottedEnemies: BaseUnit[] = [];
 
-	private _delay: number = 200;
+	private _delay: number = 100;
 
 	constructor(
 		private _playerNum: number, 
+		private _myUnits: BaseUnit[],
 		private _gameState: GameStateManager,
 	    private _inputState: InputStateManager,
 	    private _config: GameConfig
 	) {
-		this._myUnits = this._gameState.units.filter(u => u.belongsToPlayer === this._playerNum);
-
-		//TODO: how about a base commandStrategy that provides template methods for each event with some basic behavior?
-
-		this._gameState.subscribe(GameEvent.TurnStart, playerNum => this.selectNextUnit(playerNum));
-		this._gameState.subscribe(GameEvent.UnitMoveActionSelected, unit => this.moveUnit(unit));
-		this._gameState.subscribe(GameEvent.UnitMoveCompleted, unit => this.beginAttack(unit));
-		this._gameState.subscribe(GameEvent.UnitAttackActionSelected, unit => this.attackWithUnit(unit));
-		this._gameState.subscribe(GameEvent.UnitAttackCompleted, unit => this.selectNextUnit(unit.belongsToPlayer));
+		// TODO: how about a base commandStrategy that provides template methods for each event with some basic behavior?
 	}
 
-	selectNextUnit(currentPlayer: number) {
-		if (currentPlayer !== this._playerNum)
-			return;
-
+	selectNextUnit() {
 		let currentUnit = this._getNextActiveUnit();
 		if (!!currentUnit)
 			this._tapLocation(currentUnit);
 		else {
-			//TODO: do this somewhere else, like turn executor (currently AIController).
-			this._myUnits.forEach(u => u.hasMovedThisTurn = false);
 			this._gameState.dispatch(GameEvent.TurnComplete, this._playerNum);
 		}
 	}
 
 	moveUnit(unitToMove: BaseUnit) {
-		if (unitToMove.belongsToPlayer !== this._playerNum)
-			return;
-
 		this._findEnemyUnitsInSightRange();
 
 		let openCells = this._gameState.cells.filter(x => x.highlighted);
@@ -66,25 +47,16 @@ export class DemoArmyCommandStrategy implements IArmyCommandStrategy {
 			targetCell = this._getClosestTo(unitToAttack, openCells);
 		}
 
-		unitToMove.hasMovedThisTurn = true; //TODO: this should be set by unitController on moveComplete!
-
 		//leave a second with cells highlighted
 		setTimeout(() => this._tapLocation(targetCell), this._delay);
 	}
 
 	beginAttack(unit: BaseUnit) {
-		if (unit.belongsToPlayer !== this._playerNum)
-			return;
-
-
 		this._tapLocation(unit);
 		this._gameState.dispatch(GameEvent.UnitAttackActionSelected, unit);
 	}
 
 	attackWithUnit(unit: BaseUnit) {
-		if (unit.belongsToPlayer !== this._playerNum)
-			return;
-
 		let unitToAttack: BaseUnit;
 
 		do {
@@ -105,19 +77,16 @@ export class DemoArmyCommandStrategy implements IArmyCommandStrategy {
 		return this._myUnits.filter(x => x.isDead === false);
 	}
 
-
 	private _findEnemyUnitsInSightRange() {
 		let enemyUnits = this._gameState.units.filter(x => x.belongsToPlayer !== this._playerNum && !x.isDead);
 		this._spottedEnemies = [];
 
-		let myUnits = this.livingUnits;
-
-		for(let i in enemyUnits) {
+		for(let i = 0; i < enemyUnits.length; i++) {
 			let enemy = enemyUnits[i];
 
-			for(var j in myUnits) {
-				let unit = myUnits[j];
-				if(unit.stats.range <= this._distanceFrom(unit, enemy)) {
+			for(let j = 0; j < this.livingUnits.length; j++) {
+				let myUnit = this.livingUnits[j];
+				if(myUnit.stats.range <= this._distanceFrom(myUnit, enemy)) {
 					this._spottedEnemies.push(enemy);
 					break;
 				}

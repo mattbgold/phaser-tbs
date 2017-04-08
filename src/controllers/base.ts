@@ -4,7 +4,8 @@ import Signal = Phaser.Signal;
 
 @injectable()
 export abstract class BaseController {
-	abstract init(): void;
-	abstract update(): void;
-	abstract render(): void;
+	preload(): void { }
+	create(): void { }	
+	update(): void { }
+	render(): void { }
 }

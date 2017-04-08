@@ -20,7 +20,7 @@ export class InputController extends BaseController {
 		super();
 	}
 
-	init() {
+	create() {
 		 // for(let i in [0,1,2,3]) {
 		 // 	this.subscribe(parseInt(i), _ => console.log(InputEvent[parseInt(i)], _));
 		 // }
@@ -50,8 +50,6 @@ export class InputController extends BaseController {
 			this._isAttackKeyDown = false;
 		}
 	}
-
-	render(){}
 	
 	private _initKey(keyCode: number): Key {
 		let key = this._game.input.keyboard.addKey(keyCode);

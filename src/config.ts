@@ -16,7 +16,7 @@ export function getConfig(): GameConfig {
 	return {
 		cellSize: 38,
 		maps: [{
-			name: 'demo',
+			name: 'demo1',
 			armies: [
 				['scout', 'scout', 'scout', 'assault', 'assault', 'assault', 'assault'],
 				['scout', 'tank', 'tank', 'scout']
@@ -54,8 +54,9 @@ export function getConfig(): GameConfig {
 				['assault', 'assault', 'assault', 'assault', 'assault'],
 				['scout', 'scout', 'scout', 'assault', 'tank', 'tank']
 			],
-			layout: [
-				['0', '0', 'W', 'W', ' ', ' ', 'W', 'W', ' ', ' ', 'M', '1', '1'],
+			layout:
+				[
+				['0', '0', 'W', 'W', ' ', ' ', 'W', 'W', ' ', ' ', ' ', '1', '1'],
 
 				[' ', '0', 'W', 'W', ' ', ' ', ' ', 'W', ' ', 'M', 'M', '1', '1'],
 

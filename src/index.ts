@@ -50,12 +50,14 @@ class TbsGame {
     //TODO: move to controller preload()
     this.game['isoGridGroup'] = this.game.add.group();
     this.game['isoUnitsGroup'] = this.game.add.group();
+
+    this.controllers.forEach(_ => _.preload());
   }
 
   create() {
     this.game.stage.backgroundColor = '#aaccff';
 
-    this.controllers.forEach(_ => _.init());
+    this.controllers.forEach(_ => _.create());
   }
 
   render() {
