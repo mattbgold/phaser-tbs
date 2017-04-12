@@ -1,11 +1,11 @@
 import * as Phaser from 'phaser'
-import {BaseStateManager} from "../base";
+import {BaseSubject} from "../base";
 import {injectable} from "inversify";
 import {BaseUnit} from "../../../game_objects/units/base";
 import {GridCell} from "../../../game_objects/grid/grid_cell";
 
 @injectable()
-export class GameStateManager extends BaseStateManager {
+export class GameSubject extends BaseSubject {
 	constructor() {
 		super();
 	}
@@ -13,12 +13,12 @@ export class GameStateManager extends BaseStateManager {
 	units: BaseUnit[];
 	cells: GridCell[];
 	
-	getNumOfPlayers() {
-		return this.units.reduce((playerNums, unit) => playerNums.indexOf(unit.belongsToPlayer) > -1 ? playerNums: playerNums.concat(unit.belongsToPlayer), []).length;
-	}
+	numberOfPlayers: number;
 }
 
 export enum GameEvent {
+	LoadMap,
+	LoadMapCompleted,
 	GridCellActivated,
 	UnitSelected,
 	UnitMoveActionSelected,

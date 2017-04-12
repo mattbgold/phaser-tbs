@@ -1,9 +1,9 @@
 import * as Phaser from 'phaser';
 import {IArmyCommandStrategy} from "./interface";
 import Game = Phaser.Game;
-import {GameStateManager, GameEvent} from "../state/game/service";
+import {GameSubject, GameEvent} from "../subject/game/service";
 import {BaseUnit} from "../../game_objects/units/base";
-import {InputStateManager, InputEvent} from "../state/input/service";
+import {InputSubject, InputEvent} from "../subject/input/service";
 import Point3 = Phaser.Plugin.Isometric.Point3;
 import {GameConfig} from "../../config";
 import {GridCell} from "../../game_objects/grid/grid_cell";
@@ -16,8 +16,8 @@ export class DemoArmyCommandStrategy implements IArmyCommandStrategy {
 	constructor(
 		private _playerNum: number, 
 		private _myUnits: BaseUnit[],
-		private _gameState: GameStateManager,
-	    private _inputState: InputStateManager,
+		private _gameState: GameSubject,
+	    private _inputState: InputSubject,
 	    private _config: GameConfig
 	) {
 		// TODO: how about a base commandStrategy that provides template methods for each event with some basic behavior?

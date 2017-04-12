@@ -1,10 +1,10 @@
 import * as Phaser from 'phaser'
 import {injectable} from "inversify";
-import {BaseStateManager} from "../base";
+import {BaseSubject} from "../base";
 import Point3 = Phaser.Plugin.Isometric.Point3;
 
 @injectable()
-export class InputStateManager extends BaseStateManager {
+export class InputSubject extends BaseSubject {
 	constructor() {
 		super();
 	}

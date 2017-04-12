@@ -6,8 +6,8 @@ export class WaterCell extends GridCell {
 	constructor(spr: IsoSprite, x: number, y: number) {
 		super(spr, x, y);
 		
-		this.restingTint = 0x6688cc;
 		this.restingZ = -3;
+		this.restingTint = 0x4477DD;
 		this.blocksMove = true;
 		this.blocksAttack = false;
 

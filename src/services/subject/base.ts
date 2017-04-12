@@ -3,7 +3,7 @@ import Signal = Phaser.Signal;
 import {injectable} from "inversify";
 
 @injectable()
-export abstract class BaseStateManager {
+export abstract class BaseSubject {
 	private _cache: {[key:string]: any} = {};
 	protected signals: {[key: number]: Signal} = {};
 

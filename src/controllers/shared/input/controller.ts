@@ -3,9 +3,9 @@ import {injectable, inject} from "inversify";
 import Game = Phaser.Game;
 import Signal = Phaser.Signal;
 import Point3 = Phaser.Plugin.Isometric.Point3;
-import {BaseController} from "../base";
+import {BaseController} from "../../base";
 import Key = Phaser.Key;
-import {InputEvent, InputStateManager} from "../../services/state/input/service";
+import {InputEvent, InputSubject} from "../../../services/subject/input/service";
 
 @injectable()
 export class InputController extends BaseController {
@@ -15,7 +15,7 @@ export class InputController extends BaseController {
 
 	constructor(
 		private _game: Game, 
-        private _inputState: InputStateManager
+        private _inputSubject: InputSubject
 	) {
 		super();
 	}
@@ -30,22 +30,22 @@ export class InputController extends BaseController {
 
 	update() {
 		//record the position of the mouse in ISO projection
-		this._game.iso.unproject(this._game.input.activePointer.position, this._inputState.cursorPos);
+		this._game.iso.unproject(this._game.input.activePointer.position, this._inputSubject.cursorPos);
 
 		//fire mouse events
 		if(!this._isMouseDown && this._isMouseDownNow()) {
 			this._isMouseDown = true;
-			this._inputState.dispatch(InputEvent.MouseDown, this._inputState.cursorPos);
+			this._inputSubject.dispatch(InputEvent.MouseDown, this._inputSubject.cursorPos);
 		} else if (this._isMouseDown && !this._isMouseDownNow()) {
 			this._isMouseDown = false;
-			this._inputState.dispatch(InputEvent.MouseUp, this._inputState.cursorPos);
-			this._inputState.dispatch(InputEvent.Tap, this._inputState.cursorPos); //TODO: only tap if short time has passed and up pos is near down pos
+			this._inputSubject.dispatch(InputEvent.MouseUp, this._inputSubject.cursorPos);
+			this._inputSubject.dispatch(InputEvent.Tap, this._inputSubject.cursorPos); //TODO: only tap if short time has passed and up pos is near down pos
 		}
 
 		//attack key event
 		if(!this._isAttackKeyDown && this._attackKey.isDown) {
 			this._isAttackKeyDown = true;
-			this._inputState.dispatch(InputEvent.KeyAttack);
+			this._inputSubject.dispatch(InputEvent.KeyAttack);
 		} else if (this._isAttackKeyDown && !this._attackKey.isDown) {
 			this._isAttackKeyDown = false;
 		}

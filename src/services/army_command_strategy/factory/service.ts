@@ -2,18 +2,19 @@ import * as Phaser from 'phaser';
 import {IArmyCommandStrategyFactory} from "./interface";
 import {DemoArmyCommandStrategy} from "../service";
 import {IArmyCommandStrategy} from "../interface";
-import {GameStateManager} from "../../state/game/service";
-import {InputStateManager} from "../../state/input/service";
+import {GameSubject} from "../../subject/game/service";
+import {InputSubject} from "../../subject/input/service";
 import {inject, injectable} from "inversify";
 import {GameConfig} from "../../../config";
 import Game = Phaser.Game;
+import {ContainerKeys} from "../../../inversify.config";
 
 @injectable()
 export class ArmyCommandStrategyFactory implements IArmyCommandStrategyFactory {
 	constructor(
-		private _gameState: GameStateManager,
-	    private _inputState: InputStateManager,
-	    @inject('config') private _config: GameConfig
+		private _gameState: GameSubject,
+	    private _inputState: InputSubject,
+	    @inject(ContainerKeys.CONFIG) private _config: GameConfig
 	) { }
 	
 	create(playerNum: number): IArmyCommandStrategy {

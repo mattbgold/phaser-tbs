@@ -5,9 +5,10 @@ import {GridCell} from "../../../game_objects/grid/grid_cell";
 import {BaseController} from "../../base";
 import {GameConfig} from "../../../config";
 import {IMapBuilder} from "../../../services/map_builder/interface";
-import {GameStateManager, GameEvent} from "../../../services/state/game/service";
+import {GameSubject, GameEvent} from "../../../services/subject/game/service";
 import Game = Phaser.Game;
 import Tween = Phaser.Tween;
+import {ContainerKeys} from "../../../inversify.config";
 
 @injectable()
 export class UnitController extends BaseController {
@@ -16,25 +17,27 @@ export class UnitController extends BaseController {
 
 	constructor(
 		private _game: Game,
-		private _gameState: GameStateManager,
-		@inject('config') private _config: GameConfig,
-		@inject('IMapBuilder') private _mapBuilder: IMapBuilder
+		private _gameSubject: GameSubject,
+		@inject(ContainerKeys.CONFIG) private _config: GameConfig,
+		@inject(ContainerKeys.MAP_BUILDER) private _mapBuilder: IMapBuilder
 	) {
 		super();
 	}
 
 	units: BaseUnit[];
 
+	preload() {
+		this._gameSubject.subscribe(GameEvent.GridCellActivated, this._onCellActivated);
+		this._gameSubject.subscribe(GameEvent.CancelAction, this._onCancelAction);
+		this._gameSubject.subscribe(GameEvent.UnitMove, this._onUnitMove);
+		this._gameSubject.subscribe(GameEvent.UnitMoveCompleted, this._onUnitMoveCompleted);
+		this._gameSubject.subscribe(GameEvent.UnitAttack, this._onUnitAttack);
+		this._gameSubject.subscribe(GameEvent.TurnComplete, this._onTurnComplete);
+	}
+	
 	create() {
-		this._gameState.subscribe(GameEvent.GridCellActivated, this._onCellActivated);
-		this._gameState.subscribe(GameEvent.CancelAction, this._onCancelAction);
-		this._gameState.subscribe(GameEvent.UnitMove, this._onUnitMove);
-		this._gameState.subscribe(GameEvent.UnitMoveCompleted, this._onUnitMoveCompleted);
-		this._gameState.subscribe(GameEvent.UnitAttack, this._onUnitAttack);
-		this._gameState.subscribe(GameEvent.TurnComplete, this._onTurnComplete);
-		
 		this.units = this._mapBuilder.buildUnits();
-		this._gameState.units = this.units;
+		this._gameSubject.units = this.units;
 	}
 
 	update() {
@@ -56,11 +59,11 @@ export class UnitController extends BaseController {
 		let unitAtCell  = this.units.find(unit => unit.x == cell.x && unit.y == cell.y);
 		if(!!unitAtCell && this._selectedUnit !== unitAtCell) {
 			this._selectedUnit = unitAtCell;
-			this._gameState.dispatch(GameEvent.UnitSelected, unitAtCell);
+			this._gameSubject.dispatch(GameEvent.UnitSelected, unitAtCell);
 			
 			//TODO: delete me - temporary to test move overlay
 			if(!unitAtCell.hasMovedThisTurn)
-				this._gameState.dispatch(GameEvent.UnitMoveActionSelected, unitAtCell)
+				this._gameSubject.dispatch(GameEvent.UnitMoveActionSelected, unitAtCell)
 		}
 	};
 
@@ -142,7 +145,7 @@ export class UnitController extends BaseController {
 		});
 		unit.setXPosition(xPos[1]);
 		unit.setYPosition(yPos[1]);
-		tween.onComplete.add(() => this._gameState.dispatch(GameEvent.UnitMoveCompleted, unit));
+		tween.onComplete.add(() => this._gameSubject.dispatch(GameEvent.UnitMoveCompleted, unit));
 		tween.start();
 	}
 
@@ -176,7 +179,7 @@ export class UnitController extends BaseController {
 					defendingUnit.spr.kill();
 				}
 			}
-			this._gameState.dispatch(GameEvent.UnitAttackCompleted, attackingUnit);
+			this._gameSubject.dispatch(GameEvent.UnitAttackCompleted, attackingUnit);
 		});
 	}
 

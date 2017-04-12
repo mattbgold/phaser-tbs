@@ -1,15 +1,17 @@
 import {Unit} from "./models/unit";
+import {MapLayout} from "./models/map_layout";
 
 export interface GameConfig {
 	cellSize: number;
 	units: {[key:string]: Unit};
 	maps: MapLayout[];
-};
+}
 
-export interface MapLayout {
-	name: string;
-	armies: string[][];
-	layout: string[][];
+export abstract class GameStates {
+	static BOOT: string = 'boot';
+	static PRELOAD: string = 'preload';
+	static TITLE: string = 'title';
+	static GAME: string = 'game';
 }
 
 export function getConfig(): GameConfig {
