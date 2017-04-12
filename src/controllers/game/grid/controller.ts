@@ -30,6 +30,7 @@ export class GridController extends BaseController {
 
 	preload() {
 		this._inputSubject.subscribe(InputEvent.Tap, this._onTap);
+		this._gameSubject.subscribe(GameEvent.LoadMapCompleted, this._onMapLoadCompleted);
 		this._gameSubject.subscribe(GameEvent.UnitMoveActionSelected, this._onMoveActionSelected);
 		this._gameSubject.subscribe(GameEvent.UnitAttackActionSelected, this._onAttackActionSelected);
 		this._gameSubject.subscribe(GameEvent.CancelAction, this._onCancelAction);
@@ -38,10 +39,6 @@ export class GridController extends BaseController {
 	}
 	
 	create(): void {
-		this.cells = this._mapBuilder.buildGrid();
-		this._gameSubject.cells = this.cells;
-		
-		this._game.iso.simpleSort(this._game['isoGridGroup']);
 	}
 	
 	update() {
@@ -88,7 +85,13 @@ export class GridController extends BaseController {
 	// ------------------------------------
 	// ---------- EVENT HANDLERS ----------
 	// ------------------------------------
+	private _onMapLoadCompleted = () => {
+		this.cells = this._mapBuilder.buildGrid();
+		this._gameSubject.cells = this.cells;
 
+		this._game.iso.simpleSort(this._game['isoGridGroup']);
+	};
+	
 	private _onTap = (tapCoords: Phaser.Plugin.Isometric.Point3) => {
 		if (!this._canActivateCells)
 			return;

@@ -38,7 +38,9 @@ export class GameController extends BaseController {
 
 	private _loadMap = (mapName: string): void => {
 		this._mapBuilder.load(mapName);
-		this._gameSubject.numberOfPlayers = 4; //TODO: fix this
+		this._gameSubject.numberOfPlayers = this._mapBuilder.getNumOfPlayers();
+
+		this._gameSubject.dispatch(GameEvent.LoadMapCompleted);
 	};
 	
 	private _onTurnComplete = (playerNum: number): void => {

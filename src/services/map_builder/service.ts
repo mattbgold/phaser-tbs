@@ -66,6 +66,10 @@ export class MapBuilder implements IMapBuilder {
 		}
 	}
 
+	getNumOfPlayers(): number {
+		return this._unitsByPlayer.length;
+	}
+	
 	buildUnits(): BaseUnit[] {
 		let units = this._unitsByPlayer.reduce((allUnits, playerArmy) => allUnits.concat(playerArmy.map(this._mapToBaseUnit)), []);
 

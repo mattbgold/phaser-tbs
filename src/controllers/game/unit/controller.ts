@@ -27,6 +27,7 @@ export class UnitController extends BaseController {
 	units: BaseUnit[];
 
 	preload() {
+		this._gameSubject.subscribe(GameEvent.LoadMapCompleted, this._onMapLoadCompleted);
 		this._gameSubject.subscribe(GameEvent.GridCellActivated, this._onCellActivated);
 		this._gameSubject.subscribe(GameEvent.CancelAction, this._onCancelAction);
 		this._gameSubject.subscribe(GameEvent.UnitMove, this._onUnitMove);
@@ -54,6 +55,10 @@ export class UnitController extends BaseController {
 	// ------------------------------------
 	// ---------- EVENT HANDLERS ----------
 	// ------------------------------------
+	private _onMapLoadCompleted = (): void => {
+		this.units = this._mapBuilder.buildUnits();
+		this._gameSubject.units = this.units;
+	};
 	
 	private _onCellActivated = (cell: GridCell): void => {
 		let unitAtCell  = this.units.find(unit => unit.x == cell.x && unit.y == cell.y);
