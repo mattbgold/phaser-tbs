@@ -11,7 +11,9 @@ import {InputEvent, InputSubject} from "../../../services/subject/input/service"
 export class InputController extends BaseController {
 	private _isMouseDown: boolean;
 	private _attackKey: Key; //TODO: move all shortcut keys to a map
+	private _waitKey: Key;
 	private _isAttackKeyDown: boolean;
+	private _isWaitKeyDown: boolean;
 
 	constructor(
 		private _game: Game, 
@@ -26,6 +28,7 @@ export class InputController extends BaseController {
 		 // }
 		this._game.input.mouse.capture = true;
 		this._attackKey = this._initKey(Phaser.Keyboard.A);
+		this._waitKey = this._initKey(Phaser.Keyboard.W);
 	}
 
 	update() {
@@ -48,6 +51,14 @@ export class InputController extends BaseController {
 			this._inputSubject.dispatch(InputEvent.KeyAttack);
 		} else if (this._isAttackKeyDown && !this._attackKey.isDown) {
 			this._isAttackKeyDown = false;
+		}
+
+		//wait key event
+		if(!this._isWaitKeyDown && this._waitKey.isDown) {
+			this._isWaitKeyDown = true;
+			this._inputSubject.dispatch(InputEvent.KeyWait);
+		} else if (this._isWaitKeyDown && !this._waitKey.isDown) {
+			this._isWaitKeyDown = false;
 		}
 	}
 	

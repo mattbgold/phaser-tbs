@@ -40,7 +40,8 @@ export class GameController extends BaseController {
 		this._mapBuilder.load(mapName);
 		this._gameSubject.numberOfPlayers = this._mapBuilder.getNumOfPlayers();
 
-		this._gameSubject.dispatch(GameEvent.LoadMapCompleted);
+		this._gameSubject.dispatch(GameEvent.LoadMapCompleted); //ais will be created here.
+		this._gameSubject.dispatch(GameEvent.TurnStart, 0);
 	};
 	
 	private _onTurnComplete = (playerNum: number): void => {

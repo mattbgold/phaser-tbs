@@ -14,7 +14,7 @@ export abstract class BaseUnit implements Unit {
 	belongsToPlayer: number;
 	
 	hasMovedThisTurn: boolean;
-	selectedAction: any;
+	hasActedThisTurn: boolean;
 	
 	x: number;
 	y: number;

@@ -30,15 +30,15 @@ export class UnitController extends BaseController {
 		this._gameSubject.subscribe(GameEvent.LoadMapCompleted, this._onMapLoadCompleted);
 		this._gameSubject.subscribe(GameEvent.GridCellActivated, this._onCellActivated);
 		this._gameSubject.subscribe(GameEvent.CancelAction, this._onCancelAction);
+		this._gameSubject.subscribe(GameEvent.UnitWaitActionSelected, this._onWaitActionSelected);
 		this._gameSubject.subscribe(GameEvent.UnitMove, this._onUnitMove);
 		this._gameSubject.subscribe(GameEvent.UnitMoveCompleted, this._onUnitMoveCompleted);
 		this._gameSubject.subscribe(GameEvent.UnitAttack, this._onUnitAttack);
+		this._gameSubject.subscribe(GameEvent.UnitAttackCompleted, this._onUnitAttackCompleted);
 		this._gameSubject.subscribe(GameEvent.TurnComplete, this._onTurnComplete);
 	}
 	
 	create() {
-		this.units = this._mapBuilder.buildUnits();
-		this._gameSubject.units = this.units;
 	}
 
 	update() {
@@ -76,6 +76,10 @@ export class UnitController extends BaseController {
 		this._selectedUnit = null;
 	};
 
+	private _onWaitActionSelected = (unit: BaseUnit): void => {
+		this._unitFinishedTurn(unit);
+	};
+
 	private _onUnitMove = (destinationCell: GridCell): void => {
 		if(!destinationCell)
 			return;
@@ -94,6 +98,10 @@ export class UnitController extends BaseController {
 		this._handleCombat(this._selectedUnit, defendingUnit);
 	};
 
+	private _onUnitAttackCompleted = (unit: BaseUnit): void => {
+		this._unitFinishedTurn(unit);
+	};
+
 	private _onTurnComplete = (playerNum: number): void => {
 		this.units.filter(u => u.belongsToPlayer === playerNum).forEach(u => u.hasMovedThisTurn = false);
 	};
@@ -101,6 +109,12 @@ export class UnitController extends BaseController {
 	// ---------------------------------------
 	// ---------- HELPER FUNCTIONS  ----------
 	// ---------------------------------------
+
+	private _unitFinishedTurn(unit: BaseUnit): void {
+		unit.hasActedThisTurn = true;
+
+		//TODO: set tint to grayscale or something.
+	}
 
 	private _moveUnit(unit: BaseUnit, targetCell: GridCell): void {
 		let path = targetCell.pathFromActiveCell;

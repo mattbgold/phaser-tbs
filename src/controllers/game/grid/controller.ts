@@ -33,7 +33,8 @@ export class GridController extends BaseController {
 		this._gameSubject.subscribe(GameEvent.LoadMapCompleted, this._onMapLoadCompleted);
 		this._gameSubject.subscribe(GameEvent.UnitMoveActionSelected, this._onMoveActionSelected);
 		this._gameSubject.subscribe(GameEvent.UnitAttackActionSelected, this._onAttackActionSelected);
-		this._gameSubject.subscribe(GameEvent.CancelAction, this._onCancelAction);
+		this._gameSubject.subscribe(GameEvent.CancelAction, this._unhighlightAll);
+		this._gameSubject.subscribe(GameEvent.UnitWaitActionSelected, this._unhighlightAll);
 		this._gameSubject.subscribe(GameEvent.UnitMove, (): void => {this._canActivateCells = false;}); // returning false will cancel the event.
 		this._gameSubject.subscribe(GameEvent.UnitMoveCompleted, (): void => {this._canActivateCells = true;});
 	}
@@ -135,10 +136,6 @@ export class GridController extends BaseController {
 		}
 	};
 
-	private _onCancelAction = () => {
-		this._unhighlightAll();
-	};
-
 	private _onMoveActionSelected = (unit: BaseUnit) => {
 		//highlight all cells in move range
 		let cellUnderUnit = this._getCellAt(unit);
@@ -165,7 +162,7 @@ export class GridController extends BaseController {
 	// ---------- HELPER FUNCTIONS -----------
 	// ---------------------------------------
 
-	private _unhighlightAll(): void {
+	private _unhighlightAll = (): void => {
 		this._highlightCellsForMove = null;
 		this._highlightCellsForAttack = null;
 
@@ -174,7 +171,7 @@ export class GridController extends BaseController {
 			if(!cell.active)
 				cell.spr.tint = cell.restingTint;
 		});
-	}
+	};
 	
 	private _highlightCellsInRange(cell: GridCell, range: number, isAttack: boolean = false, previousCell: GridCell = null, previousDirection: string = null) {
 		if (!range || !cell || (cell.blocksMove && !isAttack) || (cell.blocksAttack && isAttack)

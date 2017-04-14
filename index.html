@@ -3,9 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <title>Game</title>
+    <link type="text/css" rel="stylesheet" href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.no-icons.min.css" />
+    <style>
+        #content {
+            position: relative;
+        }
+        .menu {
+            position: absolute;
+            border-radius: 10px;
+            border: 2px solid #eee;
+            box-shadow: 0px 2px 10px rgba(0,0,0,.5);
+            background: rgba(255,255,255,.5);
+            max-width: 100px;
+            padding: 20px;
+        }
+
+        .menu .action:not(:last-child) {
+            margin-bottom:10px;
+        }
+
+        .menu .action button {
+            width: 100%;
+            border-radius: 10px;
+        }
+    </style>
 </head>
 <body>
     <div>
-        <div id="content"></div>
+        <div id="content">
+            <div id="context-menu" class="container menu" style="display: none;">
+                <div class="action">
+                    <button id="btn-attack" class="btn btn-danger">Attack</button>
+                </div>
+                <div class="action">
+                    <button id="btn-wait" class="btn btn-default">Wait</button>
+                </div>
+                <div class="action">
+                    <button id="btn-cancel" class="btn btn-default">Cancel</button>
+                </div>
+            </div>
+        </div>
     </div>
+
 </body>

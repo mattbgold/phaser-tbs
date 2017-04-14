@@ -21,6 +21,7 @@ export enum GameEvent {
 	LoadMapCompleted,
 	GridCellActivated,
 	UnitSelected,
+	UnitWaitActionSelected,
 	UnitMoveActionSelected,
 	UnitMove,
 	UnitMoveCompleted,

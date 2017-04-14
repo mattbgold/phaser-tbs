@@ -42,4 +42,13 @@ class TbsGame {
 
 window.onload = () => {
   const game = new TbsGame();
+
+  let click = (el, action) => {
+    let event = new CustomEvent('actionSelected', {detail:{action}, bubbles: true, cancelable: false});
+    el.dispatchEvent(event);
+  };
+
+  document.getElementById('btn-attack').addEventListener('click', e => click(e.target, 'attack'));
+  document.getElementById('btn-wait').addEventListener('click', e => click(e.target, 'wait'));
+  document.getElementById('btn-cancel').addEventListener('click', e => click(e.target, 'cancel'));
 };

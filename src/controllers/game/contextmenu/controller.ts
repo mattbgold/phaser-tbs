@@ -12,6 +12,7 @@ import {ContainerKeys} from "../../../inversify.config";
 export class ContextMenuController extends BaseController {
 
 	private _selectedUnit: BaseUnit;
+	private _menuElement: HTMLElement;
 
 	constructor(
 		private _game: Game,
@@ -20,23 +21,69 @@ export class ContextMenuController extends BaseController {
 		@inject(ContainerKeys.CONFIG) private _config: GameConfig
 	) {
 		super();
+		this._menuElement = document.getElementById('context-menu');
 	}
 
 	preload() {
-		this._gameSubject.subscribe(GameEvent.UnitSelected, unit => this._selectedUnit = unit);
-		this._gameSubject.subscribe(GameEvent.CancelAction, unit => this._selectedUnit = null);
+		this._gameSubject.subscribe(GameEvent.UnitSelected, this._onUnitSelected);
+		this._gameSubject.subscribe(GameEvent.CancelAction, this._onCancelAction);
+		this._gameSubject.subscribe(GameEvent.UnitAttackActionSelected, this._hideMenu);
+		this._gameSubject.subscribe(GameEvent.UnitWaitActionSelected, this._hideMenu);
 		this._inputSubject.subscribe(InputEvent.KeyAttack, this._onKeyAttack);
+		this._inputSubject.subscribe(InputEvent.KeyWait, this._onKeyWait);
+
+		//handle events from context menu
+		window.addEventListener('actionSelected', e => {
+			let action = e['detail']['action'];
+			switch (action) {
+				case 'attack':
+					this._gameSubject.dispatch(GameEvent.UnitAttackActionSelected, this._selectedUnit);
+					break;
+				case 'wait':
+					this._gameSubject.dispatch(GameEvent.UnitWaitActionSelected, this._selectedUnit);
+					break;
+				case 'cancel':
+					this._gameSubject.dispatch(GameEvent.CancelAction);
+					break;
+				default:
+					console.error('Invalid action dispatched on actionSelected');
+			}
+		});
 	}
+
+	private _hideMenu = (): void => {
+		this._menuElement.style.display = 'none';
+	};
 
 	// ------------------------------------
 	// ---------- EVENT HANDLERS ----------
 	// ------------------------------------
 
+	private _onUnitSelected = (unit: BaseUnit): void => {
+		if(unit.hasActedThisTurn)
+			return;
+		
+		this._selectedUnit = unit;
+
+		this._menuElement.style.display = 'block';
+		this._menuElement.style.left = `${unit.spr.x + 50}px`;
+		this._menuElement.style.top = `${unit.spr.y - 80}px`;
+	};
+
+	private _onCancelAction = (): void => {
+		this._selectedUnit = null;
+		this._hideMenu();
+	};
+
 	private _onKeyAttack = (): void => {
-		//TODO: eventually we only want to dispatch this if it is a VALID time to initiate attack. I put it in here because attack will be the menu
-		// TODO: maybe this should be moved to unit controller? or perhaps action selected events belong here
 		if(!!this._selectedUnit) {
 			this._gameSubject.dispatch(GameEvent.UnitAttackActionSelected, this._selectedUnit);
+		}
+	};
+
+	private _onKeyWait = (): void => {
+		if(!!this._selectedUnit) {
+			this._gameSubject.dispatch(GameEvent.UnitWaitActionSelected, this._selectedUnit);
 		}
 	};
 }
