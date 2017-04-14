@@ -27,7 +27,7 @@ export class UnitController extends BaseController {
 	units: BaseUnit[];
 
 	preload() {
-		this._gameSubject.subscribe(GameEvent.LoadMapCompleted, this._onMapLoadCompleted);
+		this._gameSubject.subscribe(GameEvent.LoadMapCompleted, this._initializeUnits);
 		this._gameSubject.subscribe(GameEvent.GridCellActivated, this._onCellActivated);
 		this._gameSubject.subscribe(GameEvent.CancelAction, this._onCancelAction);
 		this._gameSubject.subscribe(GameEvent.UnitWaitActionSelected, this._onWaitActionSelected);
@@ -35,7 +35,7 @@ export class UnitController extends BaseController {
 		this._gameSubject.subscribe(GameEvent.UnitMoveCompleted, this._onUnitMoveCompleted);
 		this._gameSubject.subscribe(GameEvent.UnitAttack, this._onUnitAttack);
 		this._gameSubject.subscribe(GameEvent.UnitAttackCompleted, this._onUnitAttackCompleted);
-		this._gameSubject.subscribe(GameEvent.TurnComplete, this._onTurnComplete);
+		this._gameSubject.subscribe(GameEvent.TurnComplete, this._resetUnits);
 	}
 	
 	create() {
@@ -55,9 +55,11 @@ export class UnitController extends BaseController {
 	// ------------------------------------
 	// ---------- EVENT HANDLERS ----------
 	// ------------------------------------
-	private _onMapLoadCompleted = (): void => {
+	private _initializeUnits = (): void => {
 		this.units = this._mapBuilder.buildUnits();
 		this._gameSubject.units = this.units;
+
+		this._gameSubject.dispatch(GameEvent.UnitsInitialized);
 	};
 	
 	private _onCellActivated = (cell: GridCell): void => {
@@ -102,8 +104,12 @@ export class UnitController extends BaseController {
 		this._unitFinishedTurn(unit);
 	};
 
-	private _onTurnComplete = (playerNum: number): void => {
-		this.units.filter(u => u.belongsToPlayer === playerNum).forEach(u => u.hasMovedThisTurn = false);
+	private _resetUnits = (playerNum: number): void => {
+		this.units.filter(u => u.belongsToPlayer === playerNum).forEach(u => {
+			u.hasMovedThisTurn = false;
+			u.hasActedThisTurn = false;
+			u.setTint(0xffffff);
+		});
 	};
 
 	// ---------------------------------------
@@ -112,8 +118,12 @@ export class UnitController extends BaseController {
 
 	private _unitFinishedTurn(unit: BaseUnit): void {
 		unit.hasActedThisTurn = true;
+		unit.setTint(0xaaaaaa);
 
-		//TODO: set tint to grayscale or something.
+		let unitsForPlayer = this.units.filter(x => x.belongsToPlayer === unit.belongsToPlayer && !x.isDead);
+
+		if(unitsForPlayer.every(x => x.hasActedThisTurn))
+			this._gameSubject.delayedDispatch(GameEvent.TurnComplete, unit.belongsToPlayer, 1); //HACK: let other subscriptions finish first before we dispatch turn completion
 	}
 
 	private _moveUnit(unit: BaseUnit, targetCell: GridCell): void {
@@ -177,7 +187,7 @@ export class UnitController extends BaseController {
 
 		let attackerAnimation = this._game.add.tween(attackingUnit.spr).to({isoX:attackingUnit.spr.isoX + 2}, 50, Phaser.Easing.Elastic.InOut, true, 0, 4, true);
 		if (damage) {
-			this._game.time.events.repeat(50, 10, () => defendingUnit.spr.tint = defendingUnit.spr.tint === 0xff0000 ? 0xffffff : 0xff0000);
+			this._game.time.events.repeat(50, 10, () => defendingUnit.spr.tint = defendingUnit.spr.tint === 0xff0000 ? defendingUnit.currentTint : 0xff0000);
 		}
 
 		attackerAnimation.onComplete.add(() => {

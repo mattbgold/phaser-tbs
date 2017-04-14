@@ -19,7 +19,7 @@ export class AIController extends BaseController {
 	private _playerAis: {[key: number]: IArmyCommandStrategy} = {};
 
 	preload() {
-		this._gameSubject.subscribe(GameEvent.LoadMapCompleted, this._onLoadMapCompleted);
+		this._gameSubject.subscribe(GameEvent.UnitsInitialized, this.initializeAi);
 		this._gameSubject.subscribe(GameEvent.TurnStart, this._onTurnStart);
 		this._gameSubject.subscribe(GameEvent.UnitMoveActionSelected, this._onMoveActionSelected);
 		this._gameSubject.subscribe(GameEvent.UnitMoveCompleted, this._onMoveCompleted);
@@ -31,7 +31,8 @@ export class AIController extends BaseController {
 
 	}
 
-	private _onLoadMapCompleted = (): void => {
+	private initializeAi = (): void => {
+		//start at 1 because player 0 is controlled by the user
 		for(let i = 1; i < this._gameSubject.numberOfPlayers; i++) {
 			this._playerAis[i] = this._armyStrategyFactory.create(i);
 		}

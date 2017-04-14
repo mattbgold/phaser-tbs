@@ -19,6 +19,7 @@ export class GameSubject extends BaseSubject {
 export enum GameEvent {
 	LoadMap,
 	LoadMapCompleted,
+	UnitsInitialized,
 	GridCellActivated,
 	UnitSelected,
 	UnitWaitActionSelected,

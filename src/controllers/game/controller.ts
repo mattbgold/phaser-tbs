@@ -20,16 +20,16 @@ export class GameController extends BaseController {
 	}
 
 	preload() {
+		for(let i in [0, 1, 2, 3, 4, 5, 6, 7 ,8 ,9, 10, 11, 12, 13, 14]) {
+			this._gameSubject.subscribe(parseInt(i), _ => console.log(GameEvent[parseInt(i)], _));
+		}
+
 		this._gameSubject.subscribe(GameEvent.LoadMap, this._loadMap);
 		this._gameSubject.subscribe(GameEvent.TurnComplete, this._onTurnComplete);
 	}
 	
 	create() {
 		this._game.stage.backgroundColor = '#aaccff';
-
-		  for(let i in [0, 1, 2, 3, 4, 5, 6, 7 ,8 ,9, 10]) {
-		  	this._gameSubject.subscribe(parseInt(i), _ => console.log(GameEvent[parseInt(i)], _));
-		  }
 	}
 	
 	render() {

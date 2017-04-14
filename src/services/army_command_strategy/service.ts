@@ -24,12 +24,11 @@ export class DemoArmyCommandStrategy implements IArmyCommandStrategy {
 	}
 
 	selectNextUnit() {
+		if(this._playerNum === 2)
+			debugger;
 		let currentUnit = this._getNextActiveUnit();
 		if (!!currentUnit)
 			this._tapLocation(currentUnit);
-		else {
-			this._gameState.dispatch(GameEvent.TurnComplete, this._playerNum);
-		}
 	}
 
 	moveUnit(unitToMove: BaseUnit) {
@@ -86,7 +85,7 @@ export class DemoArmyCommandStrategy implements IArmyCommandStrategy {
 
 			for(let j = 0; j < this.livingUnits.length; j++) {
 				let myUnit = this.livingUnits[j];
-				if(myUnit.stats.range <= this._distanceFrom(myUnit, enemy)) {
+				if(myUnit.stats.sight >= this._distanceFrom(myUnit, enemy)) {
 					this._spottedEnemies.push(enemy);
 					break;
 				}
@@ -95,7 +94,7 @@ export class DemoArmyCommandStrategy implements IArmyCommandStrategy {
 	}
 
 	private _getNextActiveUnit() {
-		return this.livingUnits.find(u => u.hasMovedThisTurn === false);
+		return this.livingUnits.find(u => !u.hasActedThisTurn);
 	}
 
 	private _tapLocation(loc: BaseUnit | GridCell) {

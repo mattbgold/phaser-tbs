@@ -25,6 +25,10 @@ export abstract class BaseSubject {
 		this.signals[event].dispatch(payload);
 	}
 
+	delayedDispatch(event: number, payload: any, timeout: number): void {
+		setTimeout(() => this.dispatch(event, payload), timeout);
+	}
+
 	private _createSignalIfNew(event: number): void {
 		if (!this.signals[event])
 			this.signals[event] = new Signal();

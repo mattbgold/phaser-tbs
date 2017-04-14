@@ -29,6 +29,8 @@ export class ContextMenuController extends BaseController {
 		this._gameSubject.subscribe(GameEvent.CancelAction, this._onCancelAction);
 		this._gameSubject.subscribe(GameEvent.UnitAttackActionSelected, this._hideMenu);
 		this._gameSubject.subscribe(GameEvent.UnitWaitActionSelected, this._hideMenu);
+		this._gameSubject.subscribe(GameEvent.UnitMove, this._hideMenu);
+		this._gameSubject.subscribe(GameEvent.UnitMoveCompleted, this._showMenu);
 		this._inputSubject.subscribe(InputEvent.KeyAttack, this._onKeyAttack);
 		this._inputSubject.subscribe(InputEvent.KeyWait, this._onKeyWait);
 
@@ -55,19 +57,26 @@ export class ContextMenuController extends BaseController {
 		this._menuElement.style.display = 'none';
 	};
 
+	private _showMenu = (): void => {
+		if(!this._selectedUnit || this._selectedUnit.belongsToPlayer !== 0)
+			return;
+
+		this._menuElement.style.display = 'block';
+		this._menuElement.style.left = `${this._selectedUnit.spr.x + 50}px`;
+		this._menuElement.style.top = `${this._selectedUnit.spr.y - 80}px`;
+	};
+
 	// ------------------------------------
 	// ---------- EVENT HANDLERS ----------
 	// ------------------------------------
 
 	private _onUnitSelected = (unit: BaseUnit): void => {
-		if(unit.hasActedThisTurn)
+		if(unit.hasActedThisTurn || unit.belongsToPlayer !== 0) //player 0 is the user
 			return;
-		
+
 		this._selectedUnit = unit;
 
-		this._menuElement.style.display = 'block';
-		this._menuElement.style.left = `${unit.spr.x + 50}px`;
-		this._menuElement.style.top = `${unit.spr.y - 80}px`;
+		this._showMenu();
 	};
 
 	private _onCancelAction = (): void => {

@@ -13,8 +13,8 @@ export abstract class BaseUnit implements Unit {
 
 	belongsToPlayer: number;
 	
-	hasMovedThisTurn: boolean;
-	hasActedThisTurn: boolean;
+	hasMovedThisTurn: boolean = false;
+	hasActedThisTurn: boolean = false;
 	
 	x: number;
 	y: number;
@@ -24,6 +24,8 @@ export abstract class BaseUnit implements Unit {
 	stats: Stats;
 
 	abilities: any[];
+
+	currentTint: number = 0xffffff;
 	
 	constructor(model: Unit, spr: IsoSprite) {
 		this.spr = spr;
@@ -55,6 +57,11 @@ export abstract class BaseUnit implements Unit {
 		if (sign !== 0)
 			this.spr.scale.x = sign;
 		this.y = y;
+	}
+
+	setTint(tint: number) {
+		this.spr.tint = tint;
+		this.currentTint = tint;
 	}
 
 	pointToUnit(other: BaseUnit): void {
