@@ -25,14 +25,14 @@ export class ContextMenuController extends BaseController {
 	}
 
 	preload() {
-		this._gameSubject.subscribe(GameEvent.UnitSelected, this._onUnitSelected);
-		this._gameSubject.subscribe(GameEvent.CancelAction, this._onCancelAction);
+		this._gameSubject.subscribe(GameEvent.UnitSelected, this._showMenuForUnit);
+		this._gameSubject.subscribe(GameEvent.CancelAction, this._deselectAndHideMenu);
 		this._gameSubject.subscribe(GameEvent.UnitAttackActionSelected, this._hideMenu);
 		this._gameSubject.subscribe(GameEvent.UnitWaitActionSelected, this._hideMenu);
 		this._gameSubject.subscribe(GameEvent.UnitMove, this._hideMenu);
 		this._gameSubject.subscribe(GameEvent.UnitMoveCompleted, this._showMenu);
-		this._inputSubject.subscribe(InputEvent.KeyAttack, this._onKeyAttack);
-		this._inputSubject.subscribe(InputEvent.KeyWait, this._onKeyWait);
+		this._inputSubject.subscribe(InputEvent.KeyAttack, this._dispatchAttack);
+		this._inputSubject.subscribe(InputEvent.KeyWait, this._dispatchWait);
 
 		//handle events from context menu
 		window.addEventListener('actionSelected', e => {
@@ -70,7 +70,7 @@ export class ContextMenuController extends BaseController {
 	// ---------- EVENT HANDLERS ----------
 	// ------------------------------------
 
-	private _onUnitSelected = (unit: BaseUnit): void => {
+	private _showMenuForUnit = (unit: BaseUnit): void => {
 		if(unit.hasActedThisTurn || unit.belongsToPlayer !== 0) //player 0 is the user
 			return;
 
@@ -79,18 +79,18 @@ export class ContextMenuController extends BaseController {
 		this._showMenu();
 	};
 
-	private _onCancelAction = (): void => {
+	private _deselectAndHideMenu = (): void => {
 		this._selectedUnit = null;
 		this._hideMenu();
 	};
 
-	private _onKeyAttack = (): void => {
+	private _dispatchAttack = (): void => {
 		if(!!this._selectedUnit) {
 			this._gameSubject.dispatch(GameEvent.UnitAttackActionSelected, this._selectedUnit);
 		}
 	};
 
-	private _onKeyWait = (): void => {
+	private _dispatchWait = (): void => {
 		if(!!this._selectedUnit) {
 			this._gameSubject.dispatch(GameEvent.UnitWaitActionSelected, this._selectedUnit);
 		}

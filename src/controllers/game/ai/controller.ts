@@ -20,11 +20,11 @@ export class AIController extends BaseController {
 
 	preload() {
 		this._gameSubject.subscribe(GameEvent.UnitsInitialized, this.initializeAi);
-		this._gameSubject.subscribe(GameEvent.TurnStart, this._onTurnStart);
-		this._gameSubject.subscribe(GameEvent.UnitMoveActionSelected, this._onMoveActionSelected);
-		this._gameSubject.subscribe(GameEvent.UnitMoveCompleted, this._onMoveCompleted);
-		this._gameSubject.subscribe(GameEvent.UnitAttackActionSelected, this._onAttackActionSelected);
-		this._gameSubject.subscribe(GameEvent.UnitAttackCompleted, this._onAttackCompleted);
+		this._gameSubject.subscribe(GameEvent.TurnStart, this._selectFirstUnit);
+		this._gameSubject.subscribe(GameEvent.UnitMoveActionSelected, this._callMoveUnit);
+		this._gameSubject.subscribe(GameEvent.UnitMoveCompleted, this._callBeginAttack);
+		this._gameSubject.subscribe(GameEvent.UnitAttackActionSelected, this._callAttack);
+		this._gameSubject.subscribe(GameEvent.UnitAttackCompleted, this._selectNextUnit);
 	}
 
 	create() {
@@ -38,27 +38,27 @@ export class AIController extends BaseController {
 		}
 	};
 
-	private _onTurnStart = (playerNum: number): void => {
+	private _selectFirstUnit = (playerNum: number): void => {
 		if(!!this._playerAis[playerNum])
 			this._playerAis[playerNum].selectNextUnit();
 	};
 	
-	private _onMoveActionSelected = (unit: BaseUnit): void => {
+	private _callMoveUnit = (unit: BaseUnit): void => {
 		if(!!this._playerAis[unit.belongsToPlayer])
 			this._playerAis[unit.belongsToPlayer].moveUnit(unit);
 	};
 
-	private _onMoveCompleted = (unit: BaseUnit): void => {
+	private _callBeginAttack = (unit: BaseUnit): void => {
 		if(!!this._playerAis[unit.belongsToPlayer])
 			this._playerAis[unit.belongsToPlayer].beginAttack(unit);
 	};
 
-	private _onAttackActionSelected = (unit: BaseUnit): void => {
+	private _callAttack = (unit: BaseUnit): void => {
 		if(!!this._playerAis[unit.belongsToPlayer])
 			this._playerAis[unit.belongsToPlayer].attackWithUnit(unit);
 	};
 
-	private _onAttackCompleted = (unit: BaseUnit): void => {
+	private _selectNextUnit = (unit: BaseUnit): void => {
 		if(!!this._playerAis[unit.belongsToPlayer])
 			this._playerAis[unit.belongsToPlayer].selectNextUnit();
 	};

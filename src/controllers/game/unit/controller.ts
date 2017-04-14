@@ -28,13 +28,13 @@ export class UnitController extends BaseController {
 
 	preload() {
 		this._gameSubject.subscribe(GameEvent.LoadMapCompleted, this._initializeUnits);
-		this._gameSubject.subscribe(GameEvent.GridCellActivated, this._onCellActivated);
-		this._gameSubject.subscribe(GameEvent.CancelAction, this._onCancelAction);
-		this._gameSubject.subscribe(GameEvent.UnitWaitActionSelected, this._onWaitActionSelected);
-		this._gameSubject.subscribe(GameEvent.UnitMove, this._onUnitMove);
-		this._gameSubject.subscribe(GameEvent.UnitMoveCompleted, this._onUnitMoveCompleted);
-		this._gameSubject.subscribe(GameEvent.UnitAttack, this._onUnitAttack);
-		this._gameSubject.subscribe(GameEvent.UnitAttackCompleted, this._onUnitAttackCompleted);
+		this._gameSubject.subscribe(GameEvent.GridCellActivated, this._trySelectUnit);
+		this._gameSubject.subscribe(GameEvent.CancelAction, this._deselectUnit);
+		this._gameSubject.subscribe(GameEvent.UnitWaitActionSelected, this._unitFinishedTurn);
+		this._gameSubject.subscribe(GameEvent.UnitMove, this._tryMoveUnit);
+		this._gameSubject.subscribe(GameEvent.UnitMoveCompleted, this._flagUnitAsMoved);
+		this._gameSubject.subscribe(GameEvent.UnitAttack, this._tryAttackWithUnit);
+		this._gameSubject.subscribe(GameEvent.UnitAttackCompleted, this._unitFinishedTurn);
 		this._gameSubject.subscribe(GameEvent.TurnComplete, this._resetUnits);
 	}
 	
@@ -62,7 +62,7 @@ export class UnitController extends BaseController {
 		this._gameSubject.dispatch(GameEvent.UnitsInitialized);
 	};
 	
-	private _onCellActivated = (cell: GridCell): void => {
+	private _trySelectUnit = (cell: GridCell): void => {
 		let unitAtCell  = this.units.find(unit => unit.x == cell.x && unit.y == cell.y);
 		if(!!unitAtCell && this._selectedUnit !== unitAtCell) {
 			this._selectedUnit = unitAtCell;
@@ -74,34 +74,26 @@ export class UnitController extends BaseController {
 		}
 	};
 
-	private _onCancelAction = (): void => {
+	private _deselectUnit = (): void => {
 		this._selectedUnit = null;
 	};
-
-	private _onWaitActionSelected = (unit: BaseUnit): void => {
-		this._unitFinishedTurn(unit);
-	};
-
-	private _onUnitMove = (destinationCell: GridCell): void => {
+	
+	private _tryMoveUnit = (destinationCell: GridCell): void => {
 		if(!destinationCell)
 			return;
 		
 		this._moveUnit(this._selectedUnit, destinationCell)
 	};
 
-	private _onUnitMoveCompleted = (unit: BaseUnit): void => {
+	private _flagUnitAsMoved = (unit: BaseUnit): void => {
 		unit.hasMovedThisTurn = true;	
 	};
 	
-	private _onUnitAttack = (defendingUnit: BaseUnit): void => {
+	private _tryAttackWithUnit = (defendingUnit: BaseUnit): void => {
 		if (!this._selectedUnit)
 			console.error('Cannot attack, no unit selected!', defendingUnit);
 		
 		this._handleCombat(this._selectedUnit, defendingUnit);
-	};
-
-	private _onUnitAttackCompleted = (unit: BaseUnit): void => {
-		this._unitFinishedTurn(unit);
 	};
 
 	private _resetUnits = (playerNum: number): void => {
@@ -116,7 +108,7 @@ export class UnitController extends BaseController {
 	// ---------- HELPER FUNCTIONS  ----------
 	// ---------------------------------------
 
-	private _unitFinishedTurn(unit: BaseUnit): void {
+	private _unitFinishedTurn = (unit: BaseUnit): void => {
 		unit.hasActedThisTurn = true;
 		unit.setTint(0xaaaaaa);
 
@@ -124,7 +116,7 @@ export class UnitController extends BaseController {
 
 		if(unitsForPlayer.every(x => x.hasActedThisTurn))
 			this._gameSubject.delayedDispatch(GameEvent.TurnComplete, unit.belongsToPlayer, 1); //HACK: let other subscriptions finish first before we dispatch turn completion
-	}
+	};
 
 	private _moveUnit(unit: BaseUnit, targetCell: GridCell): void {
 		let path = targetCell.pathFromActiveCell;

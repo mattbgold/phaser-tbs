@@ -31,7 +31,7 @@ let container = new Container();
 
 container.bind<GameConfig>('config').toConstantValue(getConfig());
 
-//controllers
+// controllers (order here determines order of lifecycle fn calls)
 container.bind<BaseController>(ContainerKeys.CTRL_TITLE).to(InputController).inSingletonScope();
 container.bind<BaseController>(ContainerKeys.CTRL_TITLE).to(SystemController).inSingletonScope();
 
@@ -43,7 +43,7 @@ container.bind<BaseController>(ContainerKeys.CTRL_GAME).to(GridController).inSin
 container.bind<BaseController>(ContainerKeys.CTRL_GAME).to(UnitController).inSingletonScope();
 container.bind<BaseController>(ContainerKeys.CTRL_GAME).to(AIController).inSingletonScope();
 
-//subjects
+// subjects
 container.bind<GameSubject>(GameSubject).toSelf().inSingletonScope();
 container.bind<InputSubject>(InputSubject).toSelf().inSingletonScope();
 container.bind<SystemSubject>(SystemSubject).toSelf().inSingletonScope();

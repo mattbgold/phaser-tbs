@@ -25,7 +25,7 @@ export class GameController extends BaseController {
 		}
 
 		this._gameSubject.subscribe(GameEvent.LoadMap, this._loadMap);
-		this._gameSubject.subscribe(GameEvent.TurnComplete, this._onTurnComplete);
+		this._gameSubject.subscribe(GameEvent.TurnComplete, this._startNextTurn);
 	}
 	
 	create() {
@@ -44,7 +44,7 @@ export class GameController extends BaseController {
 		this._gameSubject.dispatch(GameEvent.TurnStart, 0);
 	};
 	
-	private _onTurnComplete = (playerNum: number): void => {
+	private _startNextTurn = (playerNum: number): void => {
 		let nextPlayer =  playerNum === (this._gameSubject.numberOfPlayers - 1) ? 0 : (playerNum + 1);
 
 		this._gameSubject.dispatch(GameEvent.TurnStart, nextPlayer);
