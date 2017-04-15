@@ -52,7 +52,7 @@ export function getConfig(): GameConfig {
 			name: 'demo2',
 			armies: [
 				['tank', 'tank', 'tank', 'assault'],
-				['scout'],//, 'scout', 'tank', 'assault', 'assault', 'assault'],
+				['scout', 'scout', 'tank', 'assault', 'assault', 'assault'],
 				['assault', 'assault', 'assault', 'assault', 'assault'],
 				['scout', 'scout', 'scout', 'assault', 'tank', 'tank']
 			],
