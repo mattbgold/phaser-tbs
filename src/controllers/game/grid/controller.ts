@@ -6,8 +6,8 @@ import {BaseUnit} from "../../../game_objects/units/base";
 import Game = Phaser.Game;
 import {GridCell} from "../../../game_objects/grid/grid_cell";
 import {IMapBuilder} from "../../../services/map_builder/interface";
-import {GameSubject, GameEvent} from "../../../services/subject/game/service";
-import {InputSubject, InputEvent} from "../../../services/subject/input/service";
+import {GameSubject, GameEvent} from "../../../services/subject/game";
+import {InputSubject, InputEvent} from "../../../services/subject/input";
 import {ContainerKeys} from "../../../inversify.config";
 
 @injectable()

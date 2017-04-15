@@ -17,7 +17,7 @@ export class TitleState extends Phaser.State {
 		this._controllers.forEach(_ => _.create());
 		
 		//TODO: temp hack to start the game immediately
-		this._game.state.start(GameStates.GAME, false, false, 'demo2');
+		this._game.state.start(GameStates.GAME, false, false, 'demo1');
 	}
 	
 	update() {

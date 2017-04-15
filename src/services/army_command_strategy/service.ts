@@ -1,9 +1,9 @@
 import * as Phaser from 'phaser';
 import {IArmyCommandStrategy} from "./interface";
 import Game = Phaser.Game;
-import {GameSubject, GameEvent} from "../subject/game/service";
+import {GameSubject, GameEvent} from "../subject/game";
 import {BaseUnit} from "../../game_objects/units/base";
-import {InputSubject, InputEvent} from "../subject/input/service";
+import {InputSubject, InputEvent} from "../subject/input";
 import Point3 = Phaser.Plugin.Isometric.Point3;
 import {GameConfig} from "../../config";
 import {GridCell} from "../../game_objects/grid/grid_cell";

@@ -5,7 +5,7 @@ import {GridCell} from "../../../game_objects/grid/grid_cell";
 import {BaseController} from "../../base";
 import {GameConfig} from "../../../config";
 import {IMapBuilder} from "../../../services/map_builder/interface";
-import {GameSubject, GameEvent} from "../../../services/subject/game/service";
+import {GameSubject, GameEvent} from "../../../services/subject/game";
 import Game = Phaser.Game;
 import Tween = Phaser.Tween;
 import {ContainerKeys} from "../../../inversify.config";

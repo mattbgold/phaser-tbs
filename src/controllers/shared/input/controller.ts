@@ -5,7 +5,7 @@ import Signal = Phaser.Signal;
 import Point3 = Phaser.Plugin.Isometric.Point3;
 import {BaseController} from "../../base";
 import Key = Phaser.Key;
-import {InputEvent, InputSubject} from "../../../services/subject/input/service";
+import {InputEvent, InputSubject} from "../../../services/subject/input";
 
 @injectable()
 export class InputController extends BaseController {

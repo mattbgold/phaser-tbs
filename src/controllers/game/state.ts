@@ -3,7 +3,7 @@ import State = Phaser.State;
 import {BaseController} from "../base";
 import Game = Phaser.Game;
 import {GameConfig} from "../../config";
-import {GameSubject, GameEvent} from "../../services/subject/game/service";
+import {GameSubject, GameEvent} from "../../services/subject/game";
 
 export class GameState extends Phaser.State {
 	private _mapToLoad: string;

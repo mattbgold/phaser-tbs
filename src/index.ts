@@ -14,8 +14,8 @@ import {TitleState} from "./controllers/title/state";
 import {PreloadState} from "./controllers/preload/state";
 import {ContainerKeys} from "./inversify.config";
 import {GameState} from "./controllers/game/state";
-import {SystemSubject} from "./services/subject/system/service";
-import {GameSubject} from "./services/subject/game/service";
+import {SystemSubject} from "./services/subject/system";
+import {GameSubject} from "./services/subject/game";
 
 class TbsGame {
   game: Phaser.Game;

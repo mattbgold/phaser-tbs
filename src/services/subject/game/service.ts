@@ -15,21 +15,3 @@ export class GameSubject extends BaseSubject {
 	
 	numberOfPlayers: number;
 }
-
-export enum GameEvent {
-	LoadMap,
-	LoadMapCompleted,
-	UnitsInitialized,
-	GridCellActivated,
-	UnitSelected,
-	UnitWaitActionSelected,
-	UnitMoveActionSelected,
-	UnitMove,
-	UnitMoveCompleted,
-	UnitAttackActionSelected,
-	UnitAttack,
-	UnitAttackCompleted,
-	CancelAction,
-	TurnStart,
-	TurnComplete,
-}

@@ -11,13 +11,3 @@ export class InputSubject extends BaseSubject {
 
 	cursorPos: Point3 = new Point3();
 }
-
-export enum InputEvent {
-	MouseDown,
-	MouseUp,
-	Tap,
-	DoubleTap,
-
-	KeyAttack,
-	KeyWait
-}

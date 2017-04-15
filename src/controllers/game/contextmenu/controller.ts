@@ -4,8 +4,8 @@ import {BaseController} from "../../base";
 import {BaseUnit} from "../../../game_objects/units/base";
 import {GameConfig} from "../../../config";
 import Game = Phaser.Game;
-import {GameSubject, GameEvent} from "../../../services/subject/game/service";
-import {InputSubject, InputEvent} from "../../../services/subject/input/service";
+import {GameSubject, GameEvent} from "../../../services/subject/game";
+import {InputSubject, InputEvent} from "../../../services/subject/input";
 import {ContainerKeys} from "../../../inversify.config";
 
 @injectable()

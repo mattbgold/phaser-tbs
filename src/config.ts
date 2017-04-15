@@ -20,11 +20,11 @@ export function getConfig(): GameConfig {
 		maps: [{
 			name: 'demo1',
 			armies: [
-				['scout', 'scout', 'scout', 'assault', 'assault', 'assault', 'assault'],
-				['scout', 'tank', 'tank', 'scout']
+				['scout', 'scout', 'tank', 'assault', 'assault', 'assault', 'tank'],
+				['scout', 'tank', 'tank', 'scout', 'scout', 'tank', 'scout', 'assault', 'assault']
 			],
 			layout: [
-				['W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W', 'W'],
+				['W', 'W', 'W', '1', '1', '1', '1', '1', 'W', 'W', 'W', 'W'],
 
 				['W', ' ', ' ', ' ', '1', '1', '1', '1', ' ', ' ', ' ', 'W'],
 

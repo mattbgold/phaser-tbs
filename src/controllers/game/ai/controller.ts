@@ -1,9 +1,8 @@
 import * as Phaser from 'phaser'
 import {BaseController} from "../../base";
 import {inject, injectable} from "inversify";
-import {GameSubject, GameEvent} from "../../../services/subject/game/service";
-import {IArmyCommandStrategyFactory} from "../../../services/army_command_strategy/factory/interface";
-import {IArmyCommandStrategy} from "../../../services/army_command_strategy/interface";
+import {GameSubject, GameEvent} from "../../../services/subject/game";
+import {IArmyCommandStrategyFactory, IArmyCommandStrategy} from "../../../services/army_command_strategy";
 import {BaseUnit} from "../../../game_objects/units/base";
 import {ContainerKeys} from "../../../inversify.config";
 

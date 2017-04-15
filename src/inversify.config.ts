@@ -21,11 +21,11 @@ import {MapBuilder} from "./services/map_builder/service";
 import Factory = interfaces.Factory;
 import {ArmyCommandStrategyFactory} from "./services/army_command_strategy/factory/service";
 import {IArmyCommandStrategyFactory} from "./services/army_command_strategy/factory/interface";
-import {GameSubject} from "./services/subject/game/service";
-import {InputSubject} from "./services/subject/input/service";
+import {GameSubject} from "./services/subject/game";
+import {InputSubject} from "./services/subject/input";
 import {AIController} from "./controllers/game/ai/controller";
 import {SystemController} from "./controllers/shared/system/controller";
-import {SystemSubject} from "./services/subject/system/service";
+import {SystemSubject} from "./services/subject/system";
 
 let container = new Container();
 

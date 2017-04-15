@@ -5,7 +5,7 @@ import {GameConfig} from "../../config";
 import Signal = Phaser.Signal;
 import {BaseController} from "../base";
 import {IMapBuilder} from "../../services/map_builder/interface";
-import {GameEvent, GameSubject} from "../../services/subject/game/service";
+import {GameEvent, GameSubject} from "../../services/subject/game";
 import {ContainerKeys} from "../../inversify.config";
 
 @injectable()
