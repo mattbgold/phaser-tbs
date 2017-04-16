@@ -122,7 +122,12 @@ export class GridController extends BaseController {
 				this._gameSubject.dispatch(GameEvent.UnitMove, clickedCell);
 			}
 			// else if we tapped a target cell for ATTACK action
-			else if (!!this._unitHighlightedForAttack && clickedCell.highlighted && !!unitAtClickedCell) {
+			else if (
+				!!this._unitHighlightedForAttack
+				&& clickedCell.highlighted
+				&& !!unitAtClickedCell
+				&& unitAtClickedCell.belongsToPlayer !== this._unitHighlightedForAttack.belongsToPlayer
+			) {
 				this._gameSubject.dispatch(GameEvent.UnitAttack, unitAtClickedCell);
 			}
 			// else we tapped an inactive cell not tied to any action
