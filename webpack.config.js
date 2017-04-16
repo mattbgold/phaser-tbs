@@ -10,9 +10,8 @@ var pixi = path.join(phaserModule, 'build/custom/pixi.js');
 var p2 = path.join(phaserModule, 'build/custom/p2.js');
 
 module.exports = {
-  entry: ['./src/index.ts', 'reflect-metadata/Reflect'],
+  entry: './src/index.ts',
   output: {
-    pathInfo: true,
     filename: '[name].bundle.js',
     path: path.resolve('./dist'),
     publicPath: '/'
@@ -30,22 +29,16 @@ module.exports = {
     }),
     new webpack.NoErrorsPlugin(),
   ],
-  noParse: [
-    /reflect-metadata/,
-  ],
   module: {
-    loaders: [
-      { test: /pixi\.js/, loader: 'expose?PIXI' },
-      { test: /phaser-split\.js$/, loader: 'expose?Phaser' },
-      { test: /p2\.js/, loader: 'expose?p2' },
-      { test: /\.ts?$/, loader: 'ts', exclude: '/node_modules/' }
+    rules: [
+      { test: /pixi\.js/, use: 'expose-loader?PIXI' },
+      { test: /phaser-split\.js$/, use: 'expose-loader?Phaser' },
+      { test: /p2\.js/, use: 'expose-loader?p2' },
+      { test: /\.ts?$/, use: 'ts-loader', exclude: '/node_modules/' }
     ]
   },
-  node: {
-    fs: 'empty'
-  },
   resolve: {
-    extensions: ['', '.js', '.ts'],
+    extensions: ['.js', '.ts'],
     alias: {
       'phaser': phaser,
       'pixi': pixi,
@@ -53,4 +46,4 @@ module.exports = {
     }
   },
   devtool: 'source-map'
-}
+};
