@@ -105,10 +105,10 @@ export class GridController extends BaseController {
 
 		let unitAtClickedCell = this._gameSubject.getUnitAt(clickedCell);
 
-		// if we clicked a cell that's not active
-		if(!!clickedCell && this._activeCell !== clickedCell) {
+		// if we clicked a cell
+		if(!!clickedCell) {
 			// reset the active cell
-			if(!!this._activeCell) {
+			if(this._activeCell && this._activeCell !== clickedCell) {
 				this._activeCell.active = false;
 				this._activeCell.spr.tint = this._activeCell.restingTint;
 				this._activeCell = null;
@@ -118,7 +118,7 @@ export class GridController extends BaseController {
 			// We need to check that it is a valid unit to attack etc...
 
 			// if we tapped a destination cell for MOVE action
-			if (!!this._unitHighlightedForMove && clickedCell.highlighted) {
+			if (!!this._unitHighlightedForMove && (clickedCell.highlighted || this._unitHighlightedForMove === unitAtClickedCell)) {
 				this._gameSubject.dispatch(GameEvent.UnitMove, clickedCell);
 			}
 			// else if we tapped a target cell for ATTACK action

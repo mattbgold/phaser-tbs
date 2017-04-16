@@ -136,6 +136,9 @@ export class UnitController extends BaseController {
 	private _moveUnit(unit: BaseUnit, targetCell: GridCell): void {
 		let path = targetCell.pathFromActiveCell;
 
+		if (!path.length)
+			return this._gameSubject.dispatch(GameEvent.UnitMoveCompleted, unit);
+
 		let tween = this._game.add.tween(unit.spr);
 		let xx = unit.x;
 		let yy = unit.y;
