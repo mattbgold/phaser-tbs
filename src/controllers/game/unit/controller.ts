@@ -29,7 +29,7 @@ export class UnitController extends BaseController {
 	preload() {
 		this._gameSubject.subscribe(GameEvent.LoadMapCompleted, this._initializeUnits);
 		this._gameSubject.subscribe(GameEvent.GridCellActivated, this._trySelectUnit);
-		this._gameSubject.subscribe(GameEvent.CancelAction, this._deselectUnit);
+		this._gameSubject.subscribe(GameEvent.CancelAction, this._deselectAndResetPosition);
 		this._gameSubject.subscribe(GameEvent.UnitWaitActionSelected, this._unitFinishedTurn);
 		this._gameSubject.subscribe(GameEvent.UnitMove, this._tryMoveUnit);
 		this._gameSubject.subscribe(GameEvent.UnitMoveCompleted, this._flagUnitAsMoved);
@@ -45,13 +45,6 @@ export class UnitController extends BaseController {
 		this._game.iso.simpleSort(this._game['isoUnitsGroup']);
 	}
 
-	render() {
-		if(!!this._selectedUnit) {
-			this._game.debug.text(`${this._selectedUnit.name} HP: ${this._selectedUnit.hp}`, 2, 34, "#a7aebe");
-			this._game.debug.text('Base Unit Stats:' + JSON.stringify(this._selectedUnit.stats), 2, 54, "#a7aebe");
-		}
-	}
-
 	// ------------------------------------
 	// ---------- EVENT HANDLERS ----------
 	// ------------------------------------
@@ -63,6 +56,9 @@ export class UnitController extends BaseController {
 	};
 	
 	private _trySelectUnit = (cell: GridCell): void => {
+		if(!!this._selectedUnit)
+			this._gameSubject.dispatch(GameEvent.CancelAction, this._selectedUnit);
+
 		let unitAtCell  = this.units.find(unit => unit.x == cell.x && unit.y == cell.y);
 		if(!!unitAtCell && this._selectedUnit !== unitAtCell) {
 			this._selectedUnit = unitAtCell;
@@ -74,8 +70,17 @@ export class UnitController extends BaseController {
 		}
 	};
 
-	private _deselectUnit = (): void => {
+	private _deselectAndResetPosition = (unit: BaseUnit): void => {
 		this._selectedUnit = null;
+
+		if (!!unit && !unit.hasActedThisTurn) {
+			unit.hasMovedThisTurn = false;
+			
+			unit.spr.isoX = this._config.cellSize * unit.committedX;
+			unit.spr.isoY = this._config.cellSize * unit.committedY;
+			unit.x = unit.committedX;
+			unit.y = unit.committedY;
+		}
 	};
 	
 	private _tryMoveUnit = (destinationCell: GridCell): void => {
@@ -110,6 +115,8 @@ export class UnitController extends BaseController {
 
 	private _unitFinishedTurn = (unit: BaseUnit): void => {
 		unit.hasActedThisTurn = true;
+		unit.committedX = unit.x;
+		unit.committedY = unit.y;
 		unit.setTint(0xaaaaaa);
 
 		let unitsForPlayer = this.units.filter(x => x.belongsToPlayer === unit.belongsToPlayer && !x.isDead);

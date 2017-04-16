@@ -12,6 +12,7 @@ import {ContainerKeys} from "../../../inversify.config";
 export class ContextMenuController extends BaseController {
 
 	private _selectedUnit: BaseUnit;
+	private _hoveredUnit: BaseUnit;
 	private _menuElement: HTMLElement;
 
 	constructor(
@@ -25,7 +26,7 @@ export class ContextMenuController extends BaseController {
 	}
 
 	preload() {
-		this._gameSubject.subscribe(GameEvent.UnitSelected, this._showMenuForUnit);
+		this._gameSubject.subscribe(GameEvent.UnitSelected, this._selectUnit);
 		this._gameSubject.subscribe(GameEvent.CancelAction, this._deselectAndHideMenu);
 		this._gameSubject.subscribe(GameEvent.UnitAttackActionSelected, this._hideMenu);
 		this._gameSubject.subscribe(GameEvent.UnitWaitActionSelected, this._hideMenu);
@@ -45,12 +46,35 @@ export class ContextMenuController extends BaseController {
 					this._gameSubject.dispatch(GameEvent.UnitWaitActionSelected, this._selectedUnit);
 					break;
 				case 'cancel':
-					this._gameSubject.dispatch(GameEvent.CancelAction);
+					this._gameSubject.dispatch(GameEvent.CancelAction, this._selectedUnit);
 					break;
 				default:
 					console.error('Invalid action dispatched on actionSelected');
 			}
 		});
+	}
+
+	update() {
+		let foundUnitUnderCursor = false;
+
+		this._gameSubject.units.forEach(unit => {
+			let inBounds = unit.spr.isoBounds.containsXY(this._inputSubject.cursorPos.x, this._inputSubject.cursorPos.y);
+
+			if(inBounds) {
+				foundUnitUnderCursor = true;
+				this._hoveredUnit = unit;
+			}
+		});
+
+		if (!foundUnitUnderCursor)
+			this._hoveredUnit = null;
+	}
+
+	render() {
+		if(!!this._hoveredUnit) {
+			this._game.debug.text(`${this._hoveredUnit.name} HP: ${this._hoveredUnit.hp}/${this._hoveredUnit.stats.hp}`, 2, 34, "#a7aebe");
+			this._game.debug.text(JSON.stringify(this._hoveredUnit.stats).replace(/[{}"]/g, '').replace(/,/g, ', '), 2, 54, "#a7aebe");
+		}
 	}
 
 	private _hideMenu = (): void => {
@@ -70,13 +94,8 @@ export class ContextMenuController extends BaseController {
 	// ---------- EVENT HANDLERS ----------
 	// ------------------------------------
 
-	private _showMenuForUnit = (unit: BaseUnit): void => {
-		if(unit.hasActedThisTurn || unit.belongsToPlayer !== 0) //player 0 is the user
-			return;
-
+	private _selectUnit = (unit: BaseUnit): void => {
 		this._selectedUnit = unit;
-
-		this._showMenu();
 	};
 
 	private _deselectAndHideMenu = (): void => {

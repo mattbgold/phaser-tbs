@@ -112,6 +112,8 @@ export class GridController extends BaseController {
 				this._activeCell = null;
 			}
 
+			//TODO: maybe we should just dispatch gridCellActivated and let unit controller handle dispatching UnitAttack or UnitMove. We need to check that it is a valid unit to attack etc...
+
 			// if we tapped a destination cell for MOVE action
 			if (!!this._unitHighlightedForMove && clickedCell.highlighted) {
 				this._unhighlightAll();
@@ -130,7 +132,6 @@ export class GridController extends BaseController {
 				this._activeCell = clickedCell;
 
 				// we didn't tap a cell for an action, so lets cancel any pending actions
-				this._gameSubject.dispatch(GameEvent.CancelAction, clickedCell);
 				this._gameSubject.dispatch(GameEvent.GridCellActivated, clickedCell);
 			}
 		}

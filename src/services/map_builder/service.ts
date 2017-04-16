@@ -58,8 +58,9 @@ export class MapBuilder implements IMapBuilder {
 			for(let xx = 0; xx < this._map.layout.length; xx++) {
 				let playerNum = parseInt(this._map.layout[yy][xx]);
 				if(!isNaN(playerNum)) {
-					this._unitsByPlayer[playerNum][armyIndices[playerNum]].x = xx;
-					this._unitsByPlayer[playerNum][armyIndices[playerNum]].y = yy;
+					let unit = this._unitsByPlayer[playerNum][armyIndices[playerNum]];
+					unit.x = xx;
+					unit.y = yy;
 					armyIndices[playerNum]++;
 				}
 			}

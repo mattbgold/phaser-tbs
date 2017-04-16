@@ -18,8 +18,11 @@ export abstract class BaseUnit implements Unit {
 	
 	x: number;
 	y: number;
-
-	hp: number;
+	
+	committedX: number; //stores original position until a move is committed by selecting an action.
+	committedY: number;
+	
+	hp: number; //current hp
 
 	stats: Stats;
 
@@ -40,6 +43,8 @@ export abstract class BaseUnit implements Unit {
 		this.belongsToPlayer = unit.belongsToPlayer;
 		this.x = unit.x;
 		this.y = unit.y;
+		this.committedX = unit.x;
+		this.committedY = unit.y;
 		this.stats = unit.stats;
 		this.abilities = unit.abilities;
 
@@ -58,7 +63,7 @@ export abstract class BaseUnit implements Unit {
 			this.spr.scale.x = sign;
 		this.y = y;
 	}
-
+	
 	setTint(tint: number) {
 		this.spr.tint = tint;
 		this.currentTint = tint;
