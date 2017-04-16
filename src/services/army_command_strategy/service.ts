@@ -2,9 +2,7 @@ import * as Phaser from 'phaser';
 import Game = Phaser.Game;
 import {GameSubject, GameEvent} from "../subject/game";
 import {BaseUnit} from "../../game_objects/units/base";
-import {InputSubject, InputEvent} from "../subject/input";
 import Point3 = Phaser.Plugin.Isometric.Point3;
-import {GameConfig} from "../../config";
 import {GridCell} from "../../game_objects/grid/grid_cell";
 import {IArmyCommandStrategy} from "./interface";
 
@@ -16,9 +14,7 @@ export class DemoArmyCommandStrategy implements IArmyCommandStrategy {
 	constructor(
 		private _playerNum: number, 
 		private _myUnits: BaseUnit[],
-		private _gameState: GameSubject,
-	    private _inputState: InputSubject,
-	    private _config: GameConfig
+		private _gameSubject: GameSubject
 	) {
 		// TODO: how about a base commandStrategy that provides template methods for each event with some basic behavior?
 	}
@@ -27,14 +23,15 @@ export class DemoArmyCommandStrategy implements IArmyCommandStrategy {
 		if(this._playerNum === 2)
 			debugger;
 		let currentUnit = this._getNextActiveUnit();
-		if (!!currentUnit)
-			this._tapLocation(currentUnit);
+		if (!!currentUnit) {
+			this._gameSubject.dispatch(GameEvent.GridCellActivated, this._gameSubject.getCellAt(currentUnit));
+		}
 	}
 
 	moveUnit(unitToMove: BaseUnit) {
 		this._findEnemyUnitsInSightRange();
 
-		let openCells = this._gameState.cells.filter(x => x.highlighted);
+		let openCells = this._gameSubject.cells.filter(x => x.highlighted);
 
 		let targetCell: GridCell = null;
 
@@ -47,12 +44,11 @@ export class DemoArmyCommandStrategy implements IArmyCommandStrategy {
 		}
 
 		//leave a second with cells highlighted
-		setTimeout(() => this._tapLocation(targetCell), this._delay);
+		this._gameSubject.delayedDispatch(GameEvent.UnitMove, targetCell, this._delay);
 	}
 
 	beginAttack(unit: BaseUnit) {
-		this._tapLocation(unit);
-		this._gameState.dispatch(GameEvent.UnitAttackActionSelected, unit);
+		this._gameSubject.dispatch(GameEvent.UnitAttackActionSelected, unit);
 	}
 
 	attackWithUnit(unit: BaseUnit) {
@@ -64,10 +60,10 @@ export class DemoArmyCommandStrategy implements IArmyCommandStrategy {
 			this._spottedEnemies.splice(this._spottedEnemies.indexOf(unitToAttack), 1);
 		} while (!!unitToAttack && unit.stats.attack - unitToAttack.stats.armor <= 0);
 
-		if(unitToAttack && this._cellUnderUnit(unitToAttack).highlighted)
-			setTimeout(() => this._tapLocation(unitToAttack), this._delay); //this._gameState.dispatch(GameEvent.UnitAttack, unitToAttack)
+		if(unitToAttack && this._gameSubject.getCellAt(unitToAttack).highlighted)
+			this._gameSubject.delayedDispatch(GameEvent.UnitAttack, unitToAttack, this._delay);
 		else {
-			this._gameState.dispatch(GameEvent.UnitWaitActionSelected, unit);
+			this._gameSubject.dispatch(GameEvent.UnitWaitActionSelected, unit);
 		}
 	}
 
@@ -76,7 +72,7 @@ export class DemoArmyCommandStrategy implements IArmyCommandStrategy {
 	}
 
 	private _findEnemyUnitsInSightRange() {
-		let enemyUnits = this._gameState.units.filter(x => x.belongsToPlayer !== this._playerNum && !x.isDead);
+		let enemyUnits = this._gameSubject.units.filter(x => x.belongsToPlayer !== this._playerNum && !x.isDead);
 		this._spottedEnemies = [];
 
 		for(let i = 0; i < enemyUnits.length; i++) {
@@ -95,15 +91,7 @@ export class DemoArmyCommandStrategy implements IArmyCommandStrategy {
 	private _getNextActiveUnit() {
 		return this.livingUnits.find(u => !u.hasActedThisTurn);
 	}
-
-	private _tapLocation(loc: BaseUnit | GridCell) {
-		this._inputState.dispatch(InputEvent.Tap, new Point3(loc.x * this._config.cellSize, loc.y * this._config.cellSize))
-	}
-
-	private _cellUnderUnit(unit: BaseUnit) {
-		return this._gameState.cells.find(c => c.x === unit.x && c.y === unit.y);
-	}
-
+	
 	private _distanceFrom<T>(unit: BaseUnit, loc: T): number {
 		return Math.abs(unit.x - loc['x']) + Math.abs(unit.y - loc['y']);
 	}

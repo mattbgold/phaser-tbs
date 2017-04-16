@@ -15,9 +15,11 @@ export abstract class BaseSubject {
 		return this._cache[key];
 	}
 
-	subscribe(event: number, callback: Function): void {
-		this._createSignalIfNew(event);
-		this.signals[event].add(callback);
+	subscribe(events: number | number[], callback: Function): void {
+		[].concat(events).forEach(event => {
+			this._createSignalIfNew(event);
+			this.signals[event].add(callback);
+		});
 	}
 
 	dispatch(event: number, payload: any = null): void {
@@ -25,7 +27,7 @@ export abstract class BaseSubject {
 		this.signals[event].dispatch(payload);
 	}
 
-	delayedDispatch(event: number, payload: any, timeout: number): void {
+	delayedDispatch(event: number, payload: any, timeout: number = 1): void {
 		setTimeout(() => this.dispatch(event, payload), timeout);
 	}
 

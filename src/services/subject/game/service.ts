@@ -14,4 +14,12 @@ export class GameSubject extends BaseSubject {
 	cells: GridCell[];
 	
 	numberOfPlayers: number;
+	
+	getCellAt(unit: BaseUnit): GridCell {
+		return this.cells.find(c => c.x === unit.x && c.y === unit.y);
+	}
+
+	getUnitAt(cell: GridCell): BaseUnit {
+		return this.units.find(u => u.x === cell.x && u.y === cell.y);
+	}
 }

@@ -23,7 +23,7 @@ export class AIController extends BaseController {
 		this._gameSubject.subscribe(GameEvent.UnitMoveActionSelected, this._callMoveUnit);
 		this._gameSubject.subscribe(GameEvent.UnitMoveCompleted, this._callBeginAttack);
 		this._gameSubject.subscribe(GameEvent.UnitAttackActionSelected, this._callAttack);
-		this._gameSubject.subscribe(GameEvent.UnitAttackCompleted, this._selectNextUnit);
+		this._gameSubject.subscribe([GameEvent.UnitAttackCompleted, GameEvent.UnitWaitActionSelected], this._selectNextUnit);
 	}
 
 	create() {

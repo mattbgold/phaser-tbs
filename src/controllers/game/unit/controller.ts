@@ -14,6 +14,7 @@ import {ContainerKeys} from "../../../inversify.config";
 export class UnitController extends BaseController {
 	private _selectedUnit: BaseUnit;
 	private _deadUnits: BaseUnit[] = [];
+	private _activePlayer: number;
 
 	constructor(
 		private _game: Game,
@@ -27,14 +28,14 @@ export class UnitController extends BaseController {
 	units: BaseUnit[];
 
 	preload() {
+		this._gameSubject.subscribe(GameEvent.TurnStart, this._setActivePlayer);
 		this._gameSubject.subscribe(GameEvent.LoadMapCompleted, this._initializeUnits);
 		this._gameSubject.subscribe(GameEvent.GridCellActivated, this._trySelectUnit);
 		this._gameSubject.subscribe(GameEvent.CancelAction, this._deselectAndResetPosition);
-		this._gameSubject.subscribe(GameEvent.UnitWaitActionSelected, this._unitFinishedTurn);
+		this._gameSubject.subscribe([GameEvent.UnitWaitActionSelected, GameEvent.UnitAttackCompleted], this._unitFinishedTurn);
 		this._gameSubject.subscribe(GameEvent.UnitMove, this._tryMoveUnit);
 		this._gameSubject.subscribe(GameEvent.UnitMoveCompleted, this._flagUnitAsMoved);
 		this._gameSubject.subscribe(GameEvent.UnitAttack, this._tryAttackWithUnit);
-		this._gameSubject.subscribe(GameEvent.UnitAttackCompleted, this._unitFinishedTurn);
 		this._gameSubject.subscribe(GameEvent.TurnComplete, this._resetUnits);
 	}
 	
@@ -48,6 +49,10 @@ export class UnitController extends BaseController {
 	// ------------------------------------
 	// ---------- EVENT HANDLERS ----------
 	// ------------------------------------
+	private _setActivePlayer = (playerNum: number): void => {
+		this._activePlayer = playerNum;
+	};
+
 	private _initializeUnits = (): void => {
 		this.units = this._mapBuilder.buildUnits();
 		this._gameSubject.units = this.units;
@@ -56,11 +61,14 @@ export class UnitController extends BaseController {
 	};
 	
 	private _trySelectUnit = (cell: GridCell): void => {
-		if(!!this._selectedUnit)
+		if (!!this._selectedUnit)
 			this._gameSubject.dispatch(GameEvent.CancelAction, this._selectedUnit);
 
-		let unitAtCell  = this.units.find(unit => unit.x == cell.x && unit.y == cell.y);
-		if(!!unitAtCell && this._selectedUnit !== unitAtCell) {
+		let unitAtCell  = this._gameSubject.getUnitAt(cell);
+		if (!!unitAtCell
+			&& this._selectedUnit !== unitAtCell
+			&& unitAtCell.belongsToPlayer === this._activePlayer
+		) {
 			this._selectedUnit = unitAtCell;
 			this._gameSubject.dispatch(GameEvent.UnitSelected, unitAtCell);
 			
@@ -75,7 +83,7 @@ export class UnitController extends BaseController {
 
 		if (!!unit && !unit.hasActedThisTurn) {
 			unit.hasMovedThisTurn = false;
-			
+
 			unit.spr.isoX = this._config.cellSize * unit.committedX;
 			unit.spr.isoY = this._config.cellSize * unit.committedY;
 			unit.x = unit.committedX;
@@ -122,7 +130,7 @@ export class UnitController extends BaseController {
 		let unitsForPlayer = this.units.filter(x => x.belongsToPlayer === unit.belongsToPlayer && !x.isDead);
 
 		if(unitsForPlayer.every(x => x.hasActedThisTurn))
-			this._gameSubject.delayedDispatch(GameEvent.TurnComplete, unit.belongsToPlayer, 1); //HACK: let other subscriptions finish first before we dispatch turn completion
+			this._gameSubject.delayedDispatch(GameEvent.TurnComplete, unit.belongsToPlayer); //HACK: let other subscriptions finish first before we dispatch turn completion
 	};
 
 	private _moveUnit(unit: BaseUnit, targetCell: GridCell): void {
