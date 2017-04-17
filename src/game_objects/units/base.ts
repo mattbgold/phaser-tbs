@@ -34,10 +34,10 @@ export abstract class BaseUnit implements Unit {
 		this.spr = spr;
 		this.spr.anchor.set(.5, .5);
 		
-		this.init(model);
+		this._init(model);
 	}
 	
-	init(unit: Unit) {
+	private _init(unit: Unit): void {
 		this.name = unit.name;
 		this.asset = unit.asset;
 		this.belongsToPlayer = unit.belongsToPlayer;

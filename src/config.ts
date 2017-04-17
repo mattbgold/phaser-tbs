@@ -1,9 +1,11 @@
 import {Unit} from "./models/unit";
 import {MapLayout} from "./models/map_layout";
+import {Cell} from "./models/cell";
 
 export interface GameConfig {
 	cellSize: number;
 	units: {[key:string]: Unit};
+	cells: {[key: string]: Cell};
 	maps: MapLayout[];
 }
 
@@ -157,6 +159,32 @@ export function getConfig(): GameConfig {
 					sight: 3,
 					cost: 6
 				},
+			}
+		},
+		cells: {
+			'W': {
+				name: 'water',
+				asset: 'tile_water',
+				blocksAttack: false,
+				blocksMove: true,
+				restingTint: 0x4477DD,
+				restingZ: -3
+			},
+			'M': {
+				name: 'mountain',
+				asset: 'tile',
+				blocksAttack: true,
+				blocksMove: true,
+				restingTint: 0x777777,
+				restingZ: 18
+			},
+			'B': {
+				name: 'bridge',
+				asset: 'tile',
+				blocksAttack: false,
+				blocksMove: false,
+				restingTint: 0x9b7d4d,
+				restingZ: 2
 			}
 		}
 	};

@@ -13,6 +13,7 @@ import {WaterCell} from "../../game_objects/grid/water";
 import {MountainCell} from "../../game_objects/grid/mountain";
 import {BridgeCell} from "../../game_objects/grid/bridge";
 import {MapLayout} from "../../models/map_layout";
+import {Cell} from "../../models/cell";
 
 @injectable()
 export class MapBuilder implements IMapBuilder {
@@ -29,10 +30,6 @@ export class MapBuilder implements IMapBuilder {
 		'W': WaterCell,
 		'M': MountainCell,
 		'B': BridgeCell
-	};
-
-	private _cellAssetMap: {[key:string]: string} = {
-		'W': 'tile_water'
 	};
 
 	constructor(
@@ -88,7 +85,22 @@ export class MapBuilder implements IMapBuilder {
 
 		for (let xx = 0; xx < mapLayout[0].length; xx++) {
 			for (let yy = 0; yy < mapLayout.length; yy++) {
-				let tileSpr = this._game.add.isoSprite(xx * this._config.cellSize, yy * this._config.cellSize, 0, this._cellAssetMap[mapLayout[yy][xx]] || 'tile', 0, this._game['isoGridGroup']);
+				let cellConfig = this._config.cells[mapLayout[yy][xx]];
+				let model = <Cell>{
+					asset: 'tile',
+					blocksAttack: false,
+					blocksMove: false,
+					restingTint: 0xffffff,
+					restingZ: 0,
+				};
+				if (cellConfig) {
+					model = JSON.parse(JSON.stringify(cellConfig));
+				}
+
+				model.x = xx;
+				model.y = yy;
+
+				let tileSpr = this._game.add.isoSprite(model.x * this._config.cellSize, model.y * this._config.cellSize, 0, model.asset, 0, this._game['isoGridGroup']);
 				tileSpr.anchor.set(0.5, 0);
 
 				let cellType = this._cellTypeMap[mapLayout[yy][xx]];
@@ -96,7 +108,7 @@ export class MapBuilder implements IMapBuilder {
 				if (!cellType)
 					cellType = GridCell;
 
-				let newCell: GridCell = new cellType(tileSpr, xx, yy);
+				let newCell: GridCell = new cellType(tileSpr, model);
 
 				cells.push(newCell);
 
