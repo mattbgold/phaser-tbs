@@ -26,6 +26,10 @@
             width: 100%;
             border-radius: 10px;
         }
+
+        .menu .hotkey {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -33,10 +37,10 @@
         <div id="content">
             <div id="context-menu" class="container menu" style="display: none;">
                 <div class="action">
-                    <button id="btn-attack" class="btn btn-danger">Attack</button>
+                    <button id="btn-attack" class="btn btn-danger"><span class="hotkey">A</span>ttack</button>
                 </div>
                 <div class="action">
-                    <button id="btn-wait" class="btn btn-default">Wait</button>
+                    <button id="btn-wait" class="btn btn-default"><span class="hotkey">W</span>ait</button>
                 </div>
                 <div class="action">
                     <button id="btn-cancel" class="btn btn-default">Cancel</button>
