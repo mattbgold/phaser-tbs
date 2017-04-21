@@ -50,10 +50,7 @@ export class InputController extends BaseController {
 
 			let key: Key = this._keyMap[keyEvent];
 			if(!key.justDown && key.isDown) {
-				//key.justDown = true;
 				this._inputSubject.dispatch(keyEvent);
-			} else if (key.justDown && !key.isDown) {
-				//key.justDown = false;
 			}
 		}
 	}
