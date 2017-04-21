@@ -5,5 +5,6 @@ export enum InputEvent {
 	DoubleTap,
 
 	KeyAttack,
-	KeyWait
+	KeyWait,
+	KeyCancel
 }

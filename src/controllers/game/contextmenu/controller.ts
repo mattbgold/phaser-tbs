@@ -34,6 +34,7 @@ export class ContextMenuController extends BaseController {
 		this._gameSubject.subscribe(GameEvent.UnitMoveCompleted, this._showMenu);
 		this._inputSubject.subscribe(InputEvent.KeyAttack, this._dispatchAttack);
 		this._inputSubject.subscribe(InputEvent.KeyWait, this._dispatchWait);
+		this._inputSubject.subscribe(InputEvent.KeyCancel, this._dispatchCancel);
 
 		//handle events from context menu
 		window.addEventListener('actionSelected', e => {
@@ -112,6 +113,12 @@ export class ContextMenuController extends BaseController {
 	private _dispatchWait = (): void => {
 		if(!!this._selectedUnit) {
 			this._gameSubject.dispatch(GameEvent.UnitWaitActionSelected, this._selectedUnit);
+		}
+	};
+
+	private _dispatchCancel = (): void => {
+		if(!!this._selectedUnit) {
+			this._gameSubject.dispatch(GameEvent.CancelAction, this._selectedUnit);
 		}
 	};
 }

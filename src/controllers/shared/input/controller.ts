@@ -10,11 +10,8 @@ import {InputEvent, InputSubject} from "../../../services/subject/input";
 @injectable()
 export class InputController extends BaseController {
 	private _isMouseDown: boolean;
-	private _attackKey: Key; //TODO: move all shortcut keys to a map
-	private _waitKey: Key;
-	private _isAttackKeyDown: boolean;
-	private _isWaitKeyDown: boolean;
-
+	private _keyMap: {[key:number]: Key};
+	
 	constructor(
 		private _game: Game, 
         private _inputSubject: InputSubject
@@ -27,8 +24,11 @@ export class InputController extends BaseController {
 		 // 	this.subscribe(parseInt(i), _ => console.log(InputEvent[parseInt(i)], _));
 		 // }
 		this._game.input.mouse.capture = true;
-		this._attackKey = this._initKey(Phaser.Keyboard.A);
-		this._waitKey = this._initKey(Phaser.Keyboard.W);
+		
+		this._keyMap = {};
+		this._keyMap[InputEvent.KeyAttack] = this._initKey(Phaser.Keyboard.A);
+		this._keyMap[InputEvent.KeyWait] = this._initKey(Phaser.Keyboard.W);
+		this._keyMap[InputEvent.KeyCancel] = this._initKey(Phaser.Keyboard.C);
 	}
 
 	update() {
@@ -45,27 +45,23 @@ export class InputController extends BaseController {
 			this._inputSubject.dispatch(InputEvent.Tap, this._inputSubject.cursorPos); //TODO: only tap if short time has passed and up pos is near down pos
 		}
 
-		//attack key event
-		if(!this._isAttackKeyDown && this._attackKey.isDown) {
-			this._isAttackKeyDown = true;
-			this._inputSubject.dispatch(InputEvent.KeyAttack);
-		} else if (this._isAttackKeyDown && !this._attackKey.isDown) {
-			this._isAttackKeyDown = false;
-		}
+		for(let inputKeyEvent in this._keyMap) {
+			let keyEvent = parseInt(inputKeyEvent);
 
-		//wait key event
-		if(!this._isWaitKeyDown && this._waitKey.isDown) {
-			this._isWaitKeyDown = true;
-			this._inputSubject.dispatch(InputEvent.KeyWait);
-		} else if (this._isWaitKeyDown && !this._waitKey.isDown) {
-			this._isWaitKeyDown = false;
+			let key: Key = this._keyMap[keyEvent];
+			if(!key.justDown && key.isDown) {
+				//key.justDown = true;
+				this._inputSubject.dispatch(keyEvent);
+			} else if (key.justDown && !key.isDown) {
+				//key.justDown = false;
+			}
 		}
 	}
 	
 	private _initKey(keyCode: number): Key {
 		let key = this._game.input.keyboard.addKey(keyCode);
-		this._game.input.keyboard.addKeyCapture([keyCode])
-
+		this._game.input.keyboard.addKeyCapture([keyCode]);
+		
 		return key;
 	}
 

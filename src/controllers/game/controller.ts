@@ -7,6 +7,7 @@ import {BaseController} from "../base";
 import {IMapBuilder} from "../../services/map_builder/interface";
 import {GameEvent, GameSubject} from "../../services/subject/game";
 import {ContainerKeys} from "../../inversify.config";
+import {InputEvent} from "../../services/subject/input/event";
 
 @injectable()
 export class GameController extends BaseController {
