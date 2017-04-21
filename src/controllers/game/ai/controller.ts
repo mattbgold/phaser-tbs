@@ -21,8 +21,7 @@ export class AIController extends BaseController {
 		this._gameSubject.subscribe(GameEvent.UnitsInitialized, this.initializeAi);
 		this._gameSubject.subscribe(GameEvent.TurnStart, this._selectFirstUnit);
 		this._gameSubject.subscribe(GameEvent.UnitMoveActionSelected, this._callMoveUnit);
-		this._gameSubject.subscribe(GameEvent.UnitMoveCompleted, this._callBeginAttack);
-		this._gameSubject.subscribe(GameEvent.UnitAttackActionSelected, this._callAttack);
+		this._gameSubject.subscribe(GameEvent.UnitMoveCompleted, this._callAttack);
 		this._gameSubject.subscribe([GameEvent.UnitAttackCompleted, GameEvent.UnitWaitActionSelected], this._selectNextUnit);
 	}
 
@@ -45,11 +44,6 @@ export class AIController extends BaseController {
 	private _callMoveUnit = (unit: BaseUnit): void => {
 		if(!!this._playerAis[unit.belongsToPlayer])
 			this._playerAis[unit.belongsToPlayer].moveUnit(unit);
-	};
-
-	private _callBeginAttack = (unit: BaseUnit): void => {
-		if(!!this._playerAis[unit.belongsToPlayer])
-			this._playerAis[unit.belongsToPlayer].beginAttack(unit);
 	};
 
 	private _callAttack = (unit: BaseUnit): void => {

@@ -20,8 +20,6 @@ export class DemoArmyCommandStrategy implements IArmyCommandStrategy {
 	}
 
 	selectNextUnit() {
-		if(this._playerNum === 2)
-			debugger;
 		let currentUnit = this._getNextActiveUnit();
 		if (!!currentUnit) {
 			this._gameSubject.dispatch(GameEvent.GridCellActivated, this._gameSubject.getCellAt(currentUnit));
@@ -47,11 +45,9 @@ export class DemoArmyCommandStrategy implements IArmyCommandStrategy {
 		this._gameSubject.delayedDispatch(GameEvent.UnitMove, targetCell, this._delay);
 	}
 
-	beginAttack(unit: BaseUnit) {
-		this._gameSubject.dispatch(GameEvent.UnitAttackActionSelected, unit);
-	}
-
 	attackWithUnit(unit: BaseUnit) {
+		this._gameSubject.dispatch(GameEvent.UnitAttackActionSelected, unit);
+
 		let unitToAttack: BaseUnit;
 
 		do {
