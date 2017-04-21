@@ -6,6 +6,7 @@ import Point3 = Phaser.Plugin.Isometric.Point3;
 import {BaseController} from "../../base";
 import Key = Phaser.Key;
 import {InputEvent, InputSubject} from "../../../services/subject/input";
+import {GameConfig} from "../../../config";
 
 @injectable()
 export class InputController extends BaseController {
@@ -14,21 +15,23 @@ export class InputController extends BaseController {
 	
 	constructor(
 		private _game: Game, 
-        private _inputSubject: InputSubject
+        private _inputSubject: InputSubject,
+	    @inject('config') private _config: GameConfig
 	) {
 		super();
 	}
 
 	create() {
-		 // for(let i in [0,1,2,3]) {
-		 // 	this.subscribe(parseInt(i), _ => console.log(InputEvent[parseInt(i)], _));
-		 // }
 		this._game.input.mouse.capture = true;
 		
 		this._keyMap = {};
-		this._keyMap[InputEvent.KeyAttack] = this._initKey(Phaser.Keyboard.A);
-		this._keyMap[InputEvent.KeyWait] = this._initKey(Phaser.Keyboard.W);
-		this._keyMap[InputEvent.KeyCancel] = this._initKey(Phaser.Keyboard.C);
+		for(let inputEvent in InputEvent) {
+			let keyEvent = parseInt(inputEvent);
+			let key = this._config.keyConfig[InputEvent[keyEvent]];
+			if(!!key) {
+				this._keyMap[keyEvent] = this._initKey(Phaser.Keyboard[key]);
+			}
+		}
 	}
 
 	update() {

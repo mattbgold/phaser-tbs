@@ -7,6 +7,7 @@ export interface GameConfig {
 	units: {[key:string]: Unit};
 	cells: {[key: string]: Cell};
 	maps: MapLayout[];
+	keyConfig: {[key:string]: string}
 }
 
 export abstract class GameStates {
@@ -18,6 +19,11 @@ export abstract class GameStates {
 
 export function getConfig(): GameConfig {
 	return {
+		keyConfig: {
+			KeyAttack: 'A',
+			KeyCancel: 'C',
+			KeyWait: 'W'
+		},
 		cellSize: 38,
 		maps: [{
 			name: 'demo1',
