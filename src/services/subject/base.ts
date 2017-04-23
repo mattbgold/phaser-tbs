@@ -4,16 +4,7 @@ import {injectable} from "inversify";
 
 @injectable()
 export abstract class BaseSubject {
-	private _cache: {[key:string]: any} = {};
 	protected signals: {[key: number]: Signal} = {};
-
-	//TODO: localStorage
-	set(key: string, obj: any):void {
-		this._cache[key] = obj;
-	}
-	get(key: string) {
-		return this._cache[key];
-	}
 
 	subscribe(events: number | number[], callback: Function): void {
 		[].concat(events).forEach(event => {
